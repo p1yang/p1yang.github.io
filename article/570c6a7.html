@@ -1,0 +1,828 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="p1yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="这篇文章仅讲windows下的，linux下比较简单，之后可能会写 shellcode是一段用于利用软件漏洞而执行的代码 编写首先说明，shellcode编写可以用c也可以直接用汇编来写，但难度不在一个层级，我们选择c》 vs我用的是vs2013，本来用的2008，但是找不到汇编窗口 下面是windows shellcode编写的步骤  获取kernel32.dll 基地址；  定位 GetPro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows ShellCode提取加载与免杀">
+<meta property="og:url" content="http://example.com/article/570c6a7.html">
+<meta property="og:site_name" content="p1yang">
+<meta property="og:description" content="这篇文章仅讲windows下的，linux下比较简单，之后可能会写 shellcode是一段用于利用软件漏洞而执行的代码 编写首先说明，shellcode编写可以用c也可以直接用汇编来写，但难度不在一个层级，我们选择c》 vs我用的是vs2013，本来用的2008，但是找不到汇编窗口 下面是windows shellcode编写的步骤  获取kernel32.dll 基地址；  定位 GetPro">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141753290.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141804620.png">
+<meta property="article:published_time" content="2021-09-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:author" content="p1yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141753290.png">
+  
+  
+  
+  <title>Windows ShellCode提取加载与免杀 - p1yang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>p1yang&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Windows ShellCode提取加载与免杀"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-09-07 00:00" pubdate>
+          September 7, 2021 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.3k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          45 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Windows ShellCode提取加载与免杀</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>这篇文章仅讲windows下的，linux下比较简单，之后可能会写</p>
+<p>shellcode是一段用于利用软件漏洞而执行的代码</p>
+<h1 id="编写"><a href="#编写" class="headerlink" title="编写"></a>编写</h1><p>首先说明，shellcode编写可以用c也可以直接用汇编来写，但难度不在一个层级，我们选择c》</p>
+<p>vs我用的是vs2013，本来用的2008，但是找不到汇编窗口</p>
+<p>下面是windows shellcode编写的步骤</p>
+<blockquote>
+<p>获取kernel32.dll 基地址； </p>
+<p>定位 GetProcAddress函数的地址； </p>
+<p>使用GetProcAddress确定 LoadLibrary函数的地址； </p>
+<p>然后使用 LoadLibrary加载DLL文件（例如user32.dll）； </p>
+<p>使用 GetProcAddress查找某个函数的地址（例如MessageBox）； </p>
+<p>指定函数参数； </p>
+<p>调用函数。</p>
+</blockquote>
+<p>首先要注意shellcode的<code>地址无关</code>原则</p>
+<div class="code-wrapper"><pre><code class="hljs c++"><span class="hljs-type">char</span>* arr = <span class="hljs-string">&quot;test&quot;</span>;</code></pre></div>
+
+<p>我们看到这么写的话 test存放在一个固定地址，而不同windows下的内存地址是不同的，所以我们不能将地址写死</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141753290.png" srcset="/img/loading.gif" lazyload alt="image-20220402141753290"></p>
+<div class="code-wrapper"><pre><code class="hljs c++"><span class="hljs-type">char</span> cmd[] = &#123; <span class="hljs-string">&#x27;c&#x27;</span>,<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-string">&#x27;l&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>,<span class="hljs-string">&#x27;\x00&#x27;</span>&#125;;</code></pre></div>
+
+<p>但上面这种写法就不会有固定地址，但这样写需要用<code>\x00</code>来截断</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141804620.png" srcset="/img/loading.gif" lazyload alt="image-20220402141804620"></p>
+<p>现在地址无关解决，下一步是函数调用，我们需要kernel32.dll 基地址，但是由于ASLR导致dll可以加载到不同的内存位置，需要动态定位</p>
+<p>PEB结构位于固定内存位置，所以我们可以通过PEB来获取。</p>
+<blockquote>
+<p>读取PEB结构 </p>
+<p>跳转到0xC偏移处读取Ldr指针 </p>
+<p>跳转到0x14偏移处读取 InMemoryOrderModuleList字段</p>
+</blockquote>
+<p>如果你不太懂上面三步，尽量多思考一下下面的内容</p>
+<blockquote>
+<p>进程：是计算机中的程序关于某数据集合上的一次运行活动，是系统进行资源分配和调度的基本单位，可以简单的理解为，计算机中每运行的一个软件都是一个进程。</p>
+<p>PEB：是一个位于所有进程内存中固定位置的结构体。此结构体包含关于进程的有用信息，如可执行文件加载到内存的位置，模块列表（DLL），指示进程是否被调试的标志，还有许多其他的信息。</p>
+</blockquote>
+<div class="code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">_PEB</span> &#123;
+  BYTE                          Reserved1[<span class="hljs-number">2</span>];
+  BYTE                          BeingDebugged;
+  BYTE                          Reserved2[<span class="hljs-number">1</span>];
+  PVOID                         Reserved3[<span class="hljs-number">2</span>];
+  PPEB_LDR_DATA                 Ldr;
+  PRTL_USER_PROCESS_PARAMETERS  ProcessParameters;
+  BYTE                          Reserved4[<span class="hljs-number">104</span>];
+  PVOID                         Reserved5[<span class="hljs-number">52</span>];
+  PPS_POST_PROCESS_INIT_ROUTINE PostProcessInitRoutine;
+  BYTE                          Reserved6[<span class="hljs-number">128</span>];
+  PVOID                         Reserved7[<span class="hljs-number">1</span>];
+  ULONG                         SessionId;
+&#125; PEB, *PPEB;</code></pre></div>
+
+<p>上面是微软关于PEB结构体的官方文档，</p>
+<blockquote>
+<p>上面内容的一些概念</p>
+<p>BYTE表示1个字节</p>
+<p>PVOID表示1个指针（或1个内存地址，ps：一定要弄明白指针这东西，很重要）在0x86中一个地址占四个字节</p>
+<p>PPEB_LDR_DATA是1个指针，指向自定义结构体PEB_LDR_DATAPEB_LDR_DATA</p>
+<p>BeingDebugged标志是1个字节</p>
+<p>Reserved1[2]是两个BYTE的数组，占两个字节</p>
+<p>Reserved3[2]是两个PVOID指针的数组，占八个字节</p>
+</blockquote>
+<p>我们重点关注下PEB_LDR_DATA（跳转到0xC偏移处读取Ldr指针 ）</p>
+<p>跳转偏移计算：2 + 1 + 1 + 8 &#x3D; 12 &#x3D; 0xC</p>
+<div class="code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">_PEB_LDR_DATA</span> &#123;
+  BYTE       Reserved1[<span class="hljs-number">8</span>];
+  PVOID      Reserved2[<span class="hljs-number">3</span>];
+  LIST_ENTRY InMemoryOrderModuleList;
+&#125; PEB_LDR_DATA, *PPEB_LDR_DATA;</code></pre></div>
+
+<p>关注LIST_ENTRY InMemoryOrderModuleList（跳转到0x14偏移处读取 InMemoryOrderModuleList字段）</p>
+<p>跳转偏移计算：8 + 12 &#x3D; 20 &#x3D; 0x14</p>
+<div class="code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">_LIST_ENTRY</span> &#123;
+  <span class="hljs-keyword">struct</span> <span class="hljs-title class_">_LIST_ENTRY</span>  *Flink;
+  <span class="hljs-keyword">struct</span> <span class="hljs-title class_">_LIST_ENTRY</span>  *Blink;
+&#125; LIST_ENTRY, *PLIST_ENTRY;</code></pre></div>
+
+<p>LIST_ENTRY结构是一个简单的双向链表，包含指向下一个元素（Flink）的指针和指向上一个元素的指针（Blink）</p>
+<p>InMemoryOrderModuleList字段是一个指针，指向LDR_DATA_TABLE_ENTRY 结构体上的LIST_ENTRY字段。但是它不是指向</p>
+<p>LDR_DATA_TABLE_ENTRY 起始位置的指针，而是指向这个结构的InMemoryOrderLinks字段。</p>
+<p>上面操作完到了内存首个<code>模块</code>的InMemoryOrderLinks元素，这个<code>模块</code>是一个可执行文件（.exe），我们需要去遍历加载到内存的dll文件。</p>
+<p>具体通过InMemoryOrderModuleList.Flink来访问第二个已加载的模块，通过循环操作就可以遍历所有已加载的模块</p>
+<blockquote>
+<p>calc.exe </p>
+<p>ntdll.dll </p>
+<p>kernel32.dll </p>
+</blockquote>
+<p>当我们通过遍历得到kernel32.dll后就可以完成下面操作了</p>
+<blockquote>
+<p>获取kernel32.dll 基地址； </p>
+<p>定位 GetProcAddress函数的地址； </p>
+<p>使用GetProcAddress确定 LoadLibrary函数的地址； </p>
+<p>然后使用 LoadLibrary加载DLL文件（例如user32.dll）； </p>
+<p>使用 GetProcAddress查找某个函数的地址（例如MessageBox）； </p>
+<p>指定函数参数； </p>
+<p>调用函数。</p>
+</blockquote>
+<p>这边有个代码模版，如果你实在不会写可以参考这个模版来理解上述操作</p>
+<div class="code-wrapper"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;Windows.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;winnt.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;winternl.h&gt;</span></span>
+
+<span class="hljs-function">DWORD <span class="hljs-title">getHash</span><span class="hljs-params">(<span class="hljs-type">char</span>* str)</span> </span>&#123;
+	DWORD h = <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">while</span> (*str) &#123;
+		h = (h &gt;&gt; <span class="hljs-number">13</span>) | (h &lt;&lt; (<span class="hljs-number">32</span> - <span class="hljs-number">13</span>));
+		h += *str &gt;= <span class="hljs-string">&#x27;a&#x27;</span> ? *str - <span class="hljs-number">32</span> : *str;
+		str++;
+	&#125;
+	<span class="hljs-keyword">return</span> h;
+&#125;
+<span class="hljs-function">DWORD <span class="hljs-title">getunicodeHash</span><span class="hljs-params">(<span class="hljs-type">wchar_t</span>* str)</span> </span>&#123;
+	DWORD h = <span class="hljs-number">0</span>;
+	PWORD ptr = (PWORD)str;
+	<span class="hljs-keyword">while</span> (*ptr) &#123;
+		h = (h &gt;&gt; <span class="hljs-number">13</span>) | (h &lt;&lt; (<span class="hljs-number">32</span> - <span class="hljs-number">13</span>));
+		h += (BYTE)(*ptr) &gt;= <span class="hljs-string">&#x27;a&#x27;</span> ? (BYTE)(*ptr) - <span class="hljs-number">32</span> : (BYTE)(*ptr);
+		ptr++;
+	&#125;
+	<span class="hljs-keyword">return</span> h;
+&#125;
+<span class="hljs-function">PVOID <span class="hljs-title">getWinExec</span><span class="hljs-params">()</span> </span>&#123;
+	<span class="hljs-type">char</span> dllname[] = &#123; <span class="hljs-string">&#x27;K&#x27;</span>,<span class="hljs-string">&#x27;E&#x27;</span>,<span class="hljs-string">&#x27;R&#x27;</span>,<span class="hljs-string">&#x27;N&#x27;</span>,<span class="hljs-string">&#x27;E&#x27;</span>,<span class="hljs-string">&#x27;L&#x27;</span>,<span class="hljs-string">&#x27;3&#x27;</span>,<span class="hljs-string">&#x27;2&#x27;</span>,<span class="hljs-string">&#x27;.&#x27;</span>,<span class="hljs-string">&#x27;D&#x27;</span>,<span class="hljs-string">&#x27;L&#x27;</span>,<span class="hljs-string">&#x27;L&#x27;</span>,<span class="hljs-string">&#x27;\x00&#x27;</span> &#125;;
+	<span class="hljs-type">char</span> api[] = &#123; <span class="hljs-string">&#x27;W&#x27;</span>,<span class="hljs-string">&#x27;i&#x27;</span>,<span class="hljs-string">&#x27;n&#x27;</span>,<span class="hljs-string">&#x27;E&#x27;</span>,<span class="hljs-string">&#x27;x&#x27;</span>,<span class="hljs-string">&#x27;e&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>,<span class="hljs-string">&#x27;\x00&#x27;</span> &#125;;
+	_PEB* peb = <span class="hljs-built_in">NtCurrentTeb</span>()-&gt;ProcessEnvironmentBlock;
+	LIST_ENTRY* first = peb-&gt;Ldr-&gt;InMemoryOrderModuleList.Flink;
+	LIST_ENTRY* ptr = first;
+	<span class="hljs-keyword">do</span> &#123;
+		LDR_DATA_TABLE_ENTRY* dte = (LDR_DATA_TABLE_ENTRY*)((BYTE*)ptr - <span class="hljs-number">0x8</span>);
+		BYTE* baseAddress = (BYTE*)dte-&gt;DllBase;
+		ptr = ptr-&gt;Flink;
+		<span class="hljs-keyword">if</span> (!baseAddress)
+			<span class="hljs-keyword">continue</span>;
+		PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)baseAddress;
+		PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)(baseAddress + dosHeader-&gt;e_lfanew);
+		DWORD iedRVA = ntHeader-&gt;OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+		<span class="hljs-keyword">if</span> (!iedRVA)
+			<span class="hljs-keyword">continue</span>;
+		PIMAGE_EXPORT_DIRECTORY ied = (PIMAGE_EXPORT_DIRECTORY)(baseAddress + iedRVA);
+		<span class="hljs-keyword">if</span> (<span class="hljs-built_in">getunicodeHash</span>(((<span class="hljs-keyword">decltype</span>(dte-&gt;FullDllName)*)(DWORD*)&amp;(dte-&gt;Reserved4))-&gt;Buffer) == <span class="hljs-built_in">getHash</span>(dllname)) &#123;
+			DWORD* nameRVAs = (DWORD*)(baseAddress + ied-&gt;AddressOfNames);
+			<span class="hljs-keyword">for</span> (DWORD i = <span class="hljs-number">0</span>; i &lt; ied-&gt;NumberOfNames; i++) &#123;
+				<span class="hljs-type">char</span>* funcName = (<span class="hljs-type">char</span>*)(baseAddress + nameRVAs[i]);
+				<span class="hljs-keyword">if</span> (<span class="hljs-built_in">getHash</span>(funcName) == <span class="hljs-built_in">getHash</span>(api)) &#123;
+					WORD ordinal = ((WORD*)(baseAddress + ied-&gt;AddressOfNameOrdinals))[i];
+					DWORD functionRVA = ((DWORD*)(baseAddress + ied-&gt;AddressOfFunctions))[ordinal];
+					<span class="hljs-keyword">return</span> baseAddress + functionRVA;
+				&#125;
+			&#125;
+		&#125;
+	&#125; <span class="hljs-keyword">while</span> (ptr != first);
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+&#125;
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">()</span> </span>&#123;
+	<span class="hljs-type">char</span> exec[] = &#123; <span class="hljs-string">&#x27;c&#x27;</span>,<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-string">&#x27;l&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>,<span class="hljs-string">&#x27;\x00&#x27;</span>&#125;;
+	<span class="hljs-keyword">decltype</span>(WinExec)* myWinExec = (<span class="hljs-keyword">decltype</span>(WinExec)*)<span class="hljs-built_in">getWinExec</span>();
+	<span class="hljs-built_in">myWinExec</span>(exec, <span class="hljs-number">0</span>);
+&#125;
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>
+<span class="hljs-function"></span>&#123;
+	<span class="hljs-built_in">func</span>();
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;</code></pre></div>
+
+<p>上面代码执行完之后会弹出windows计算器</p>
+<blockquote>
+<p>这里不讲windows可利用shellcode的编写，cs，msf都已经提供了很好用的shellcode</p>
+</blockquote>
+<h1 id="提取"><a href="#提取" class="headerlink" title="提取"></a>提取</h1><p>shellcode的提取</p>
+<blockquote>
+<p>使用c++开发代码</p>
+<p>更改VisualStudio编译配置</p>
+<p>生成exe</p>
+<p>在IDA下打开生成的exe，获得机器码</p>
+</blockquote>
+<p>开发代码我们已经完成了，接下来是编译</p>
+<p>配置编译选项，下面很多是默认的</p>
+<blockquote>
+<p>release在调试工具栏</p>
+</blockquote>
+<p>使大小最小化</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性  - c&#x2F;c++ - 优化 - 最大优化（优选大小）</p>
+</blockquote>
+<p>内联函数扩展</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性  - c&#x2F;c++ - 优化 - 函数扩展(只适用于_inline(Ob1))</p>
+</blockquote>
+<p>启用内部函数</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性  - c&#x2F;c++ - 优化 - 启用函数选择（是）</p>
+</blockquote>
+<p>禁用安全检查(&#x2F;Gs-)</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性  - c&#x2F;c++ - 代码生成 - 安全检查（禁用）</p>
+</blockquote>
+<p>启用函数级链接</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性  - c&#x2F;c++ - 代码生成 - 启用函数级链接(是)</p>
+</blockquote>
+<p>增量链接</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性 - 链接器 -  常规 -启用增量链接 （否）</p>
+</blockquote>
+<p>生成映射文件</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性 - 链接器 - 调试 - 生成映射文件 （是）</p>
+<p>映射文件名随便写</p>
+</blockquote>
+<p>启用COMDAT折叠</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性 - 链接器 - 优化 - 启用COMDAT折叠（是）</p>
+</blockquote>
+<p>函数顺序</p>
+<blockquote>
+<p>项目 - (你项目名称的)属性 - 链接器 - 优化 - 函数顺序 （function_order.txt）</p>
+</blockquote>
+<p>关闭SDL检查 </p>
+<blockquote>
+<p>项目 - (你项目名称的)属性 - c&#x2F;c++ - SDL检查改为否</p>
+</blockquote>
+<p>生成exe文件，用ida打开</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%86%E5%90%91/" class="category-chain-item">逆向</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Windows ShellCode提取加载与免杀</div>
+      <div>http://example.com/article/570c6a7.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>p1yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>September 7, 2021</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/article/201a570f.html" title="tcpdump抓包">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">tcpdump抓包</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/article/ec08c5f4.html" title="intel x86寄存器及其汇编指令">
+                        <span class="hidden-mobile">intel x86寄存器及其汇编指令</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://p1yang.github.io" target="_blank" rel="nofollow noopener"><span>p1yang</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

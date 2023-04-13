@@ -1,0 +1,656 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="p1yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="学习思路来源于zdi：https:&#x2F;&#x2F;www.zerodayinitiative.com&#x2F;blog&#x2F;2020&#x2F;2&#x2F;6&#x2F;mindshare-dealing-with-encrypted-router-firmware 关于如何判断是否加密在另一篇文章有提到： https:&#x2F;&#x2F;p1yang.github.io&#x2F;2022&#x2F;04&#x2F;02&#x2F;iot&#x2F;iot学习感悟&#x2F; 一般来说固件加密有三种情况：  初始版本未加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="路由器固件解密思路">
+<meta property="og:url" content="http://example.com/article/876237c8.html">
+<meta property="og:site_name" content="p1yang">
+<meta property="og:description" content="学习思路来源于zdi：https:&#x2F;&#x2F;www.zerodayinitiative.com&#x2F;blog&#x2F;2020&#x2F;2&#x2F;6&#x2F;mindshare-dealing-with-encrypted-router-firmware 关于如何判断是否加密在另一篇文章有提到： https:&#x2F;&#x2F;p1yang.github.io&#x2F;2022&#x2F;04&#x2F;02&#x2F;iot&#x2F;iot学习感悟&#x2F; 一般来说固件加密有三种情况：  初始版本未加">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427111553846.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427113725651.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427114528196.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427115925211.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427120035013.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427143219538.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427151046949.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427151221942.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427151356109.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427152259592.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427152314636.png">
+<meta property="article:published_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:author" content="p1yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427111553846.png">
+  
+  
+  
+  <title>路由器固件解密思路 - p1yang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>p1yang&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="路由器固件解密思路"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-07-20 17:57" pubdate>
+          July 20, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          764 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">路由器固件解密思路</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>学习思路来源于zdi：<code>https://www.zerodayinitiative.com/blog/2020/2/6/mindshare-dealing-with-encrypted-router-firmware</code></p>
+<p>关于如何判断是否加密在另一篇文章有提到： <code>https://p1yang.github.io/2022/04/02/iot/iot学习感悟/</code></p>
+<p>一般来说固件加密有三种情况：</p>
+<ol>
+<li>初始版本未加密，后续某个版本加密了 在加密与初始版本中间某个版本附带了解密程序</li>
+</ol>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427111553846.png" srcset="/img/loading.gif" lazyload alt="image-20220427111553846"></p>
+<p>​        获取中间版本，从中分析解密程序。</p>
+<ol start="2">
+<li>老版有加密，后续更换加密方式，中间发布未加密的过渡版本固件</li>
+</ol>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427113725651.png" srcset="/img/loading.gif" lazyload alt="image-20220427113725651"></p>
+<p>​        与1类似，也是同样获取带有解密程序的过渡版本固件分析提取解密程序</p>
+<ol start="3">
+<li>老版有加密，后续更换加密方式，中间更换了新的未加密的解密程序</li>
+</ol>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427114528196.png" srcset="/img/loading.gif" lazyload alt="image-20220427114528196"></p>
+<p>​        如果清楚早期加密方式，或者拥有早期解密程序，可以去分析更换解密程序的中间版本，来获取解密程序。</p>
+<p>​        如果没有早期相关解密信息，则无法使用上面方式，更多是购买设备，从硬件直接提取未加密的固件。</p>
+<p>​        理论上，可以使用二进制对比分析工具，来分析尝试提取复原解密程序。</p>
+<p>这是选用了经典的Dlink-DIR882的固件进行分析：</p>
+<p>ftp：<a href="ftp://ftp2.dlink.com/PRODUCTS/DIR-882/REVA/">ftp://ftp2.dlink.com/PRODUCTS/DIR-882/REVA/</a></p>
+<p>从固件时间顺序往早期查验</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427115925211.png" srcset="/img/loading.gif" lazyload alt="image-20220427115925211"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427120035013.png" srcset="/img/loading.gif" lazyload alt="image-20220427120035013"></p>
+<p>发现<code>DIR882A1_FW104B02_Middle_FW_Unencrypt.bin</code>就是我们所说的过渡版本。</p>
+<p>提取，分析，我们要通过他来查找解密程序。</p>
+<p>或者复现根据升级路径来查找。</p>
+<p>这里比较幸运通过关键字查到在bin下的imgdecrypt，但我们不能确定他一定是正确的解密程序</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427143219538.png" srcset="/img/loading.gif" lazyload alt="image-20220427143219538"></p>
+<p>我们尝试执行他。</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427151046949.png" srcset="/img/loading.gif" lazyload alt="image-20220427151046949"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427151221942.png" srcset="/img/loading.gif" lazyload alt="image-20220427151221942"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427151356109.png" srcset="/img/loading.gif" lazyload alt="image-20220427151356109"></p>
+<p>跟上面对比，正确能够被识别出文件。</p>
+<p>尝试将其他固件也都测试下</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427152259592.png" srcset="/img/loading.gif" lazyload alt="image-20220427152259592"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220427152314636.png" srcset="/img/loading.gif" lazyload alt="image-20220427152314636"></p>
+<p>上面是命名比较规范的一种，有些命名不规范可能需要去根据前端升级去寻找相应的功能。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/iot/" class="category-chain-item">iot</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>路由器固件解密思路</div>
+      <div>http://example.com/article/876237c8.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>p1yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 20, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/article/41f88cb3.html" title="iot学习感悟">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">iot学习感悟</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/article/44df6587.html" title="tenda路由器的漏洞发现">
+                        <span class="hidden-mobile">tenda路由器的漏洞发现</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://p1yang.github.io" target="_blank" rel="nofollow noopener"><span>p1yang</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

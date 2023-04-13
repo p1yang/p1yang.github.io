@@ -1,0 +1,892 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="p1yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="蓝牙蓝牙是一种近距离无线通信技术，运行在2.4GHz免费频段，目前已大量应用于各种移动终端，物联网，健康医疗，智能家居等行业。 低功耗蓝牙协议是由蓝牙技术联盟（Bluetooth SIG）在2010年发布的蓝牙4.0，并不是蓝牙3.0的升级，而是全新的技术架构。 蓝牙4.0版本分为两种模式，单模蓝牙和双模蓝牙。 双模蓝牙，支持低功耗蓝牙的同时还兼容经典蓝牙，经典蓝牙的特点是大数据高速率，例如音频、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协议-低功耗蓝牙协议(BLE)">
+<meta property="og:url" content="http://example.com/article/94a01627.html">
+<meta property="og:site_name" content="p1yang">
+<meta property="og:description" content="蓝牙蓝牙是一种近距离无线通信技术，运行在2.4GHz免费频段，目前已大量应用于各种移动终端，物联网，健康医疗，智能家居等行业。 低功耗蓝牙协议是由蓝牙技术联盟（Bluetooth SIG）在2010年发布的蓝牙4.0，并不是蓝牙3.0的升级，而是全新的技术架构。 蓝牙4.0版本分为两种模式，单模蓝牙和双模蓝牙。 双模蓝牙，支持低功耗蓝牙的同时还兼容经典蓝牙，经典蓝牙的特点是大数据高速率，例如音频、">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111025384.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026149.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026362.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026174.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026650.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026460.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026344.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027574.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027280.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027889.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111046396.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027258.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027128.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027355.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027834.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027932.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028268.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028533.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028931.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028239.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111052210.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111144377.jpeg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111144425.jpeg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111111065.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111116973.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111123878.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111126880.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111132736.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111138001.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111145004.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111145706.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111147071.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111147434.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111150198.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111151788.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111152383.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111406103.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111433751.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111435279.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111436532.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111437647.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111437233.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111439744.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111440241.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111443278.png">
+<meta property="article:published_time" content="2023-01-11T08:42:31.000Z">
+<meta property="article:modified_time" content="2023-01-11T08:42:31.000Z">
+<meta property="article:author" content="p1yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111025384.jpg">
+  
+  
+  
+  <title>协议-低功耗蓝牙协议(BLE) - p1yang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>p1yang&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="协议-低功耗蓝牙协议(BLE)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-11 16:42" pubdate>
+          January 11, 2023 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.2k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          52 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">协议-低功耗蓝牙协议(BLE)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="蓝牙"><a href="#蓝牙" class="headerlink" title="蓝牙"></a>蓝牙</h1><p>蓝牙是一种近距离无线通信技术，运行在2.4GHz免费频段，目前已大量应用于各种移动终端，物联网，健康医疗，智能家居等行业。</p>
+<p>低功耗蓝牙协议是由蓝牙技术联盟（Bluetooth SIG）在2010年发布的蓝牙4.0，并不是蓝牙3.0的升级，而是全新的技术架构。</p>
+<p>蓝牙4.0版本分为两种模式，单模蓝牙和双模蓝牙。</p>
+<p>双模蓝牙，支持低功耗蓝牙的同时还兼容经典蓝牙，经典蓝牙的特点是大数据高速率，例如音频、视频等数据传输，常见的蓝牙音箱就是双模蓝牙，他需要大量的音频数据传输。</p>
+<p>单模蓝牙，即低功耗蓝牙模式，是蓝牙4.0中的重点技术，低功耗，快连接，长距离。像各种手环，蓝牙温度计等都属于单模蓝牙。</p>
+<h1 id="低功耗蓝牙"><a href="#低功耗蓝牙" class="headerlink" title="低功耗蓝牙"></a>低功耗蓝牙</h1><p>目前低功耗蓝牙在移动终端，智能家居，互联设备等市场都有广泛应用。</p>
+<p>其优点：</p>
+<ul>
+<li>低功耗，使用纽扣电池就可以运行数月至数年。</li>
+<li>快连接，毫秒级的连接速度，传统蓝牙甚至长达数分钟。</li>
+<li>远距离，长达数百米的通信距离，而传统蓝牙通常10米左右。</li>
+</ul>
+<p>蓝牙联盟为低功耗蓝牙定义了一些标准数据规范（profile），只要遵守该规范，任意厂家的蓝牙设备，均可以相互连接与通信，例如无线蓝牙键盘鼠标，无论是安卓或是iOS还是Windows，均是即插即用，这便是“标准”的力量。</p>
+<p>低功耗蓝牙支持的标准Profile有：</p>
+<ul>
+<li>HID，用于无线鼠标，键盘或其他遥控设备。</li>
+<li>BatteryServices，电池状态服务，用于告知电池电量状态。</li>
+<li>HRP，心率计Profile，用于心率采集。等等。</li>
+</ul>
+<p>低功耗蓝牙还可以自定义Profile，伴随着智能手机的发展和普及，低功耗蓝牙的这个特性得到了发扬光大，同时也拓宽了低功耗蓝牙的应用领域。例如，可以自定义一个开关量的Profile，数据01表示开灯，数据00表示关灯，然后手机发送数据01和00就可以控制灯的亮和灭。</p>
+<p>类似的应用案例有很多，下面总结应用特点：</p>
+<ul>
+<li>支持自定义Profile，可以收发任意格式的数据，如01和00。</li>
+<li>支持自定义设备，支持任意设备的连接和通信，例如智能蓝牙插座等。</li>
+</ul>
+<h1 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h1><p>以下将低功耗蓝牙统称为BLE，低功耗蓝牙设备称为BLE设备。</p>
+<h2 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h2><p>BLE设备角色主要分为两种角色，<code>主机（Master）</code>和<code>从机（Peripheral）</code>，当主机和从机建立连接之后才能相互收发数据。</p>
+<ul>
+<li>主机，主机可以发起对从机的扫描连接。例如手机，通常作为BLE的主机设备。</li>
+<li>从机，从机只能广播并等待主机的连接。例如智能手环，是作为BLE的从机设备。</li>
+</ul>
+<p>另外还有<code>观察者（Observer）</code>和<code>广播者（Broadcaster）</code>，这两种角色不常使用，但也十分有用，例如苹果的iBeacon，就是使用广播者角色来做，只需要广播特定内容即可。</p>
+<blockquote>
+<p>iBeacon，苹果公司开发的一种通过低功耗蓝牙技术进行一个十分精确的微定位技术;</p>
+</blockquote>
+<ul>
+<li>观察者，观察者角色监听空中的广播事件，和主机唯一的区别是不能发起连接，只能持续扫描从机。</li>
+<li>广播者，广播者可以持续广播信息，和从机的唯一区别是不能被主机连接，只能广播数据</li>
+</ul>
+<p>蓝牙协议栈没有限制设备的角色范围，同一个BLE设备，可以作为主机，也可以作为从机，我们称之为主从一体，主从一体的好处是，每个BLE设备都是对等的，可以发起连接，也可以被别人连接，更加实用。</p>
+<h2 id="广播"><a href="#广播" class="headerlink" title="广播"></a>广播</h2><p>一个智能手环，在绑定之前，需要让手机发现自己才能去进行绑定操作。</p>
+<p>这个让手机发现自己的操作就叫做广播。</p>
+<p>即从机每经过一个时间间隔发送一次<code>广播数据包</code>，这个时间间隔称为<code>广播间隔</code>，这个广播动作叫做<code>广播事件</code>，只有当从机处于广播状态时，主机才能发现该从机。</p>
+<p>BLE设备拥有40个信道，从0到39，其中37，38，39就是BLE的广播信道。</p>
+<p>在每个广播事件中，广播包会分别在37,38和39三个信道上依次广播。</p>
+<p>广播时间间隔的范围是从20ms到10.24s，广播间隔影响建立连接的时间。广播间隔越大，连接的时间越长。</p>
+<p>广播数据包最多能携带31个字节的数据，一般包含可读的设备名称，设备是否可连接等信息。</p>
+<p>当主机收到从机广播的数据包后，它可以再发送获取更多数据包的请求，这个时候从机将广播<code>扫描回应</code>数据包，扫描回应数据包和广播包一样，可以携带31个字节的数据，如果长度不足，会补0，这部分数据无意义。</p>
+<blockquote>
+<p>提示：蓝牙4.x，广播有效载荷最多是31个字节。而在蓝牙5.0中，通过添加额外的广播信道和新的广播PDU，将有效载荷增加到了255个字节</p>
+</blockquote>
+<p>在安卓手机中可以使用BLE调试助手来查看广播包。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111025384.jpg" srcset="/img/loading.gif" lazyload alt="0A3834EF258FD440B5A62DAF533A5AB9"></p>
+<p>广播包一般格式为 0x长度类型数据长度类型数据…</p>
+<p>0x02011A05030F1892FD11094544494649455220545753312050726F</p>
+<p>这是我附近某个耳机的广播信息。</p>
+<p>分析：</p>
+<ul>
+<li>0x02&#x2F;01&#x2F;1A05，长度2&#x2F;类型&#x2F;对应长度的值。</li>
+<li>0x03&#x2F;0F&#x2F;1892FD，长度3&#x2F;类型&#x2F;对应长度的值。</li>
+<li>0x11&#x2F;09&#x2F;4544494649455220545753312050726F，长度16&#x2F;类型&#x2F;对应的值。</li>
+</ul>
+<p>前两段数据并不能看出什么信息，第三段数据可以转为ascii看一下。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026149.png" srcset="/img/loading.gif" lazyload alt="image-20230106111344806"></p>
+<p>即蓝牙耳机名字。</p>
+<h2 id="扫描"><a href="#扫描" class="headerlink" title="扫描"></a>扫描</h2><p>扫描是主机监听从机广播数据包和发送扫描请求的过程，主机通过扫描，可以获取到从机的广播包以及扫描回应数据包，主机可以对已扫描到的从机设备发起连接请求，从而连接从机设备并通信。</p>
+<p>扫描动作有两个比较重要的时间参数：<code>扫描窗口</code>和<code>扫描间隔</code>，如果扫描窗口等于扫描间隔，那么主机将一直处于扫描状态之中，持续监听从机广播包。</p>
+<p><a target="_blank" rel="noopener" href="http://doc.iotxx.com/%E6%96%87%E4%BB%B6:BLE%E6%8A%80%E6%9C%AF_%E6%89%AB%E6%8F%8F%E7%AA%97%E5%8F%A3%E5%92%8C%E6%89%AB%E6%8F%8F%E9%97%B4%E9%9A%94.jpg"><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026362.jpg" srcset="/img/loading.gif" lazyload alt="BLE技术 扫描窗口和扫描间隔.jpg"></a></p>
+<ul>
+<li>被动扫描，主机监听广播信道的数据，当接收到广播包时，协议栈将向上层（也就是应用层，用户可编程）传递广播包。</li>
+<li>主动扫描，主动扫描除了完成被动扫描的动作外，还会向从机发送一个扫描请求，从机收到该请求时，会再次发送一个称作<code>扫描回应</code>的广播包。</li>
+</ul>
+<h2 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h2><p>除了扫描， 设备也可以主动发起连接， 发起状态的设备和扫描状态的设备区别在于：当它监听到一个可连接的广播， 发起设备就会发送一个连接请求， 而扫描设备会发送一个扫描请求。连接请求包括一套为从设备准备的连接参数， 安排连接期间发生的通道和时间。如果广播设备接收了连接， 两个设备会进入连接状态， 发起方会称为 Master（主机），而广播方会称为 Slave（从机）。</p>
+<p>所有的通信都发生在两个设备的连接事件期间， 连接事件周期的发生， 按照连接参数指定的间隔联系， 每个事件发生在某个数据通道（0~36）， 调频增量参数决定了下次连接时间发生的通道， 在每个连接时间期间， Master 先发送， Slave 会在 150us 之后做出回应， 即使一个连接事件发生（ 或两者）， 双方都没有数据发送（例外情况是从设备潜伏使能）， 这允许两个设备都承认对方仍然存在并保持活跃的连接。</p>
+<p>主机和从机都可以主动断开连接。一边发起断开， 另一边必须在断开连接之前回应这个断开请求。</p>
+<h2 id="通信"><a href="#通信" class="headerlink" title="通信"></a>通信</h2><p>BLE 通信的两个基本概念。</p>
+<ul>
+<li><strong>GAP</strong> 通用访问配置文件(Generic Access Profile)</li>
+<li><strong>GATT</strong> 通用属性配置文件(Generic Attribute Protocol)</li>
+</ul>
+<p>GAP完成了上面广播，连接的操作。</p>
+<p>GATT则定义了两个 BLE 设备连接后如何使用服务和属性两个概念进行数据交换。</p>
+<p>GATT 的两个主要概念：</p>
+<ul>
+<li>服务（Services）</li>
+<li>特征（Characteristics）</li>
+</ul>
+<p><code>Profile</code>包含一个或者多个<code>服务</code>，每个<code>服务</code>又包含一个或者多个<code>特征</code>。主机可以发现和获取从机的<code>服务</code>和<code>特征</code>，然后与之通信。<code>特征</code>是主从通信的最小单元。</p>
+<p>每个服务和特征都有自己的唯一标识<code>UUID</code>，标准UUID为128位，蓝牙协议栈中一般采用16位，也就是两个字节的UUID格式。</p>
+<p>每个特征都有自己的属性，属性的取值有：<code>可读 Read</code>，<code>可写 Write</code> 以及 <code>通知 Notify</code>。</p>
+<p>这样，两个BLE设备就有以下的数据交互方式。</p>
+<ul>
+<li>主机可主动向从机Write写入或Read读取数据。</li>
+<li>从机可主动向主机Notify通知数据。</li>
+</ul>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>这里使用了两台手机来模拟两个BLE设备</p>
+<p>从机：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026174.png" srcset="/img/loading.gif" lazyload alt="image-20230109174401933"></p>
+<p>主机连接从机：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026650.png" srcset="/img/loading.gif" lazyload alt="Screenshot_20230110-143857"></p>
+<p>上面链接后可以看到整个profile，下面每个UUID对应一个服务，不同服务之间有不同的特征。在UUID为 0xFFF0的服务中，有三个特征，0xFFF1，0xFFF2，0xFFF3。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026460.png" srcset="/img/loading.gif" lazyload alt="image-20230111094129656"></p>
+<p>可以看到FFF1的属性为read&#x2F;notify，可读，通知。FFF2的属性为Write，可写。</p>
+<p>从机页面中，从机通过0xfff1发送数据。0xfff2接收数据。</p>
+<h3 id="0xfff1"><a href="#0xfff1" class="headerlink" title="0xfff1"></a>0xfff1</h3><p>从机发送数据：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111026344.png" srcset="/img/loading.gif" lazyload alt="image-20230111094259820"></p>
+<p>主机实时接收:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027574.png" srcset="/img/loading.gif" lazyload alt="image-20230111094737409"></p>
+<h3 id="0xfff2"><a href="#0xfff2" class="headerlink" title="0xfff2"></a>0xfff2</h3><p>主机发送数据：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027280.png" srcset="/img/loading.gif" lazyload alt="image-20230111095031034"></p>
+<p>从机实时接收：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027889.png" srcset="/img/loading.gif" lazyload alt="image-20230111095106285"></p>
+<h1 id="嗅探"><a href="#嗅探" class="headerlink" title="嗅探"></a>嗅探</h1><p>可以理解为利用窃听装置来获取双方通信内容。</p>
+<p>ble设备功能设计中，一定会少不了私有的Service或Characteristic，就要通过app逆向或嗅探蓝牙通信来分析了。</p>
+<p>蓝牙嗅探最好的神器是Ubertooth One，精致的硬件＋配套的软件变成了物联网黑客强大的帮手。</p>
+<blockquote>
+<p>这玩意挺贵的，贵不是他的缺点，是我的缺点。</p>
+</blockquote>
+<p>所以我们使用暂时使用廉价的替代方案，BLE USB Dongle。之后有设备后会配套更新相应文章。</p>
+<blockquote>
+<p>这玩意只支持ble</p>
+</blockquote>
+<p>这里使用的是一块nRF52832 Dongle，某宝可以直接买到烧录好的板子，具体烧录过程就不赘述。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111046396.jpg" srcset="/img/loading.gif" lazyload alt="image-20230111104642738"></p>
+<p>具体可看官方文档：<a target="_blank" rel="noopener" href="https://www.nordicsemi.com/Products">https://www.nordicsemi.com/Products</a></p>
+<h2 id="配置wireshark"><a href="#配置wireshark" class="headerlink" title="配置wireshark"></a>配置wireshark</h2><p>购买板子后找客服要来物料包，其中包含相关插件。</p>
+<p>打开 wireshark → 帮助 → 关于 wireshark → 文件夹 → 双击打开 Extcap 路径(全 局路径和个人路径二选其一)如下图所示:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027258.png" srcset="/img/loading.gif" lazyload alt="image-20230111101431156"></p>
+<p>将 extcap 文件夹的四个文件复制到 wireshark 的 extcap 路径下， 以全局路径为例，如图所示:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027128.png" srcset="/img/loading.gif" lazyload alt="image-20230111101537140"></p>
+<p>双击 wireshark 个人配置的路径，如图:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027355.png" srcset="/img/loading.gif" lazyload alt="image-20230111101655494"></p>
+<p>在弹出的文件夹中打开 profiles 文件夹</p>
+<p>将解压压缩包的 Profile_nRF_Sniffer_xx_xx 文件夹拷贝到 profiles 文件夹中，如图:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027834.png" srcset="/img/loading.gif" lazyload alt="image-20230111101728559"></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>软件配置成功后，将设备 插入 USB 口连接至 PC 端，打开 Wireshark，选 择 nRF sniffer COMx，具体串口号根据实际选择。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111027932.png" srcset="/img/loading.gif" lazyload alt="image-20230111101925074"></p>
+<p>在工具栏中选择 → 视图 → 接口工具栏 → nRF sniffer，会出现如下界面(默认抓取 所有 BLE 广播信号):</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028268.png" srcset="/img/loading.gif" lazyload alt="image-20230111101959670"></p>
+<p>选择任一 BLE 从机上电进行广播。 </p>
+<p>抓取指定 MAC 地址设备的数据包。</p>
+<p>可通过 APP 查看设备 MAC 地址，如下图所示:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028533.png" srcset="/img/loading.gif" lazyload alt="image-20230111102043707"></p>
+<p>如下图红色方框中所示，点击 devices 过滤下拉框选择对应 MAC 地址的 device，选择 固定设备后则只会抓取和该设备有关的数据包。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028931.png" srcset="/img/loading.gif" lazyload alt="image-20230111102101560"></p>
+<p>Wireshark 选择该 MAC 地址设备后，该设备的广播包、scan request packet 和 scan response packet 都会被捕获到。</p>
+<p>![image-20230111102119282](&#x2F;Users&#x2F;pipi&#x2F;Library&#x2F;Application Support&#x2F;typora-user-images&#x2F;image-20230111102119282.png)</p>
+<p>该设备与任意 master 通信的数据包都可以被抓取，包括连接过程和连接之后的数据 包。双击任意一个 packet 可查看具体内容，例如该设备广播包抓取内容如下:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111028239.png" srcset="/img/loading.gif" lazyload alt="image-20230111102137695"></p>
+<h1 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h1><p>其实是对一个简单的蓝牙氛围灯的嗅探与攻击，其功能比较简单且无数据加密。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111052210.jpg" srcset="/img/loading.gif" lazyload alt="image-20230111105207086"></p>
+<p>app长这样</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111144377.jpeg" srcset="/img/loading.gif" lazyload alt="IMG_2E60123242CF-1"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111144425.jpeg" srcset="/img/loading.gif" lazyload alt="IMG_82B5E06A322C-1"></p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>使用wireshark来嗅探相关信息。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111111065.png" srcset="/img/loading.gif" lazyload alt="image-20230111111111938"></p>
+<p>使用手机app连接灯。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111116973.png" srcset="/img/loading.gif" lazyload alt="image-20230111111617864"></p>
+<p>有很多Empty PDU空包，使用  !(btle.data_header.llid &#x3D;&#x3D; 0x1) 来过滤</p>
+<h3 id="开关"><a href="#开关" class="headerlink" title="开关"></a>开关</h3><p>从手机发送打开命令</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111123878.png" srcset="/img/loading.gif" lazyload alt="image-20230111112358755"></p>
+<p>其对0x000e特征发送了bc01010155</p>
+<p>关闭命令</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111126880.png" srcset="/img/loading.gif" lazyload alt="image-20230111112654746"></p>
+<p>对0x000e特征发送了bc01010055</p>
+<p>通过对比，第5位的01&#x2F;00控制灯的打开和关闭。</p>
+<h3 id="改变速度"><a href="#改变速度" class="headerlink" title="改变速度"></a>改变速度</h3><p>该灯可以调节灯块闪烁速度。从0-100</p>
+<p>修改为0</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111132736.png" srcset="/img/loading.gif" lazyload alt="image-20230111113239663"></p>
+<p>修改为100</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111138001.png" srcset="/img/loading.gif" lazyload alt="image-20230111113830782"></p>
+<p>对比第四位从00-64转换为10进制，即0-100</p>
+<p>所以通过修改该参数可控制速度。</p>
+<p>bc0801 00 55</p>
+<h3 id="改变灵敏度"><a href="#改变灵敏度" class="headerlink" title="改变灵敏度"></a>改变灵敏度</h3><p>与速度类似</p>
+<p>修改为0</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111145004.png" srcset="/img/loading.gif" lazyload alt="image-20230111114518816"></p>
+<p>修改为100</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111145706.png" srcset="/img/loading.gif" lazyload alt="image-20230111114553528"></p>
+<p>特征与速度类似</p>
+<h3 id="改变模式"><a href="#改变模式" class="headerlink" title="改变模式"></a>改变模式</h3><p>第一个模式</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111147071.png" srcset="/img/loading.gif" lazyload alt="image-20230111114710947"></p>
+<p>最后一个模式</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111147434.png" srcset="/img/loading.gif" lazyload alt="image-20230111114739307"></p>
+<p>所以模式从01-99共153个。</p>
+<p>bc060200 01 55</p>
+<h3 id="改变颜色"><a href="#改变颜色" class="headerlink" title="改变颜色"></a>改变颜色</h3><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111150198.png" srcset="/img/loading.gif" lazyload alt="image-20230111115025067"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111151788.png" srcset="/img/loading.gif" lazyload alt="image-20230111115131681"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111152383.png" srcset="/img/loading.gif" lazyload alt="image-20230111115200253"></p>
+<p>通过对多个颜色的分析，数据格式应该为bc04060 11c 0 196 000055，其中11c控制亮度，196控制颜色。</p>
+<p>通过上面的分析，发现都是通过0x000e来进行操作。</p>
+<h1 id="攻击"><a href="#攻击" class="headerlink" title="攻击"></a>攻击</h1><p>这里利用linux蓝牙栈（blueZ）来操作。</p>
+<blockquote>
+<p>sudo apt-get install bluez</p>
+</blockquote>
+<p>安装完成后会有hcitool和gatttool两个工具，分别进行扫描和连接以及数据的读写。</p>
+<p>硬件使用一个蓝牙4.0的免驱适配器。</p>
+<p>如果你的电脑虚拟机无法获取到主机网卡，可以在vm设置中取消与linux共享蓝牙设备，再接入外接适配器。</p>
+<h2 id="hciconfig"><a href="#hciconfig" class="headerlink" title="hciconfig"></a>hciconfig</h2><p>用于配置蓝牙设备。我们可以运行这个命令来列出连接到我们计算机的 BLE 适配器以及它们的基本信息。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111406103.png" srcset="/img/loading.gif" lazyload alt="image-20230111140645973"></p>
+<p>hciconfig hciX up 启用名为 hciX 的蓝牙设备</p>
+<p>hciconfig hciX down 停用名为 hciX 的蓝牙设备</p>
+<p>如果之后扫描和连接过程中出现什么问题，可以通过这两条命令来重启蓝牙设备尝试解决。</p>
+<h2 id="hcitool"><a href="#hcitool" class="headerlink" title="hcitool"></a>hcitool</h2><p>hcitool 用于配置蓝牙连接，并向蓝牙设备发送一些特殊命令。</p>
+<p>hcitool -i hciX 使用 hciX 接口，如果不指定，默认使用第一个可用接口。</p>
+<p>hcitool scan 扫描处于发现模式的传统蓝牙设备。</p>
+<p>hcitool lescan 扫描 BLE 设备。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111433751.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="Gattool"><a href="#Gattool" class="headerlink" title="Gattool"></a>Gattool</h3><p>gatttool -I 以交互模式启动 gatttool。</p>
+<p>gatttool -t random -b [adr] -I 使用随机 LE 地址在交互模式下启动 gattool。连接到地址为 adr 的远程蓝牙设备。</p>
+<p>primary 检查已连接 BLE 设备的可用服务。</p>
+<p>characteristic 检查已连接 BLE 设备的可用属性，以便从中读取数据。</p>
+<p>char-desc 特征描述符的发现。检查 n 个 handle。</p>
+<p>char-read-hnd 使用 handle 读取属性 。</p>
+<p>char-write-req 向 handle 写入值。</p>
+<p>通过扫描获取的灯泡mac地址ff:22:09:30:00:18</p>
+<p>使用<code>gatttool</code>连接</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111435279.png" srcset="/img/loading.gif" lazyload alt="image-20230111143500095"></p>
+<p>有时候连接成功了但是会报错，需要再连接下。</p>
+<p>使用<code>primary</code>查看服务</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111436532.png" srcset="/img/loading.gif" lazyload alt="image-20230111143606390"></p>
+<p>使用<code>Characteristics</code>查看特征</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111437647.png" srcset="/img/loading.gif" lazyload alt="image-20230111143704457"></p>
+<p>在找到服务和特征后，需要知道读&#x2F;写数据的 handle。这可以使用<code>char-desc</code>命令得到。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111437233.png" srcset="/img/loading.gif" lazyload alt="image-20230111143742105"></p>
+<p>在找到 handle 后，使用命令<code>char-read-hnd &lt;handle&gt;</code>从 handle 中读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111439744.png" srcset="/img/loading.gif" lazyload alt="image-20230111143910570"></p>
+<p>也可以使用<code>char-read-uuid &lt;uuid&gt;</code>来读取。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111440241.png" srcset="/img/loading.gif" lazyload alt="image-20230111144016084"></p>
+<p>从前面嗅探中可知，该灯是通过0x000e来写入数据。</p>
+<p>可以命令<code>char-write-req &lt;handle&gt; &lt;value&gt;</code> 向 handle 中写入值。</p>
+<p>关机：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202301111443278.png" srcset="/img/loading.gif" lazyload alt="image-20230111144300103"></p>
+<p>如果<code>char-write-req</code>报错，可以使用<code>char-write-cmd</code>替换。</p>
+<p>不过注意cmd是没有返回内容的，只能从设备反应来查看是否执行成功。</p>
+<hr>
+<p>以上就是入门BLE协议的相关知识，关与协议的工具，有个比较强的大的框架mirage，不过相关文章很少，需要自行研究。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/RCayre/mirage">https://github.com/RCayre/mirage</a></p>
+</blockquote>
+<p>之后也会尝试更多相关设备的研究。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/iot/" class="category-chain-item">iot</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>协议-低功耗蓝牙协议(BLE)</div>
+      <div>http://example.com/article/94a01627.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>p1yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>January 11, 2023</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/article/0.html" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/article/f3404829.html" title="碎碎念">
+                        <span class="hidden-mobile">碎碎念</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://p1yang.github.io" target="_blank" rel="nofollow noopener"><span>p1yang</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

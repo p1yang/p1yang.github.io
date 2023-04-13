@@ -1,0 +1,1254 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="p1yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一个非常轻量的httpd服务器，只有500行代码。 我后边用python写了一个很简陋的几十行代码的，可以看下那个来简单看一下。 这里只看了网络编程的一些东西，进程通信挖个坑，下次填。 很适合  https:&#x2F;&#x2F;github.com&#x2F;EZLippi&#x2F;Tinyhttpd.git 编译方式是直接make  编译执行后发现开启4000端口  默认加载htdocs下的index.html  当去访问一个不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协议-tinyhttpd">
+<meta property="og:url" content="http://example.com/article/68d281b.html">
+<meta property="og:site_name" content="p1yang">
+<meta property="og:description" content="一个非常轻量的httpd服务器，只有500行代码。 我后边用python写了一个很简陋的几十行代码的，可以看下那个来简单看一下。 这里只看了网络编程的一些东西，进程通信挖个坑，下次填。 很适合  https:&#x2F;&#x2F;github.com&#x2F;EZLippi&#x2F;Tinyhttpd.git 编译方式是直接make  编译执行后发现开启4000端口  默认加载htdocs下的index.html  当去访问一个不">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720153445595.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720154305858.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720154327199.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720160433477.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720155641576.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720160541100.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720152650036.png">
+<meta property="article:published_time" content="2022-08-01T05:04:55.000Z">
+<meta property="article:modified_time" content="2022-08-01T05:04:55.000Z">
+<meta property="article:author" content="p1yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720153445595.png">
+  
+  
+  
+  <title>协议-tinyhttpd - p1yang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>p1yang&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="协议-tinyhttpd"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-08-01 13:04" pubdate>
+          August 1, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          17k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          144 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">协议-tinyhttpd</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>一个非常轻量的httpd服务器，只有500行代码。</p>
+<p>我后边用python写了一个很简陋的几十行代码的，可以看下那个来简单看一下。</p>
+<p>这里只看了网络编程的一些东西，进程通信挖个坑，下次填。</p>
+<p>很适合</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/EZLippi/Tinyhttpd.git">https://github.com/EZLippi/Tinyhttpd.git</a></p>
+<p>编译方式是直接make</p>
+</blockquote>
+<p>编译执行后发现开启4000端口</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720153445595.png" srcset="/img/loading.gif" lazyload alt="image-20220720153445595"></p>
+<p>默认加载htdocs下的index.html</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720154305858.png" srcset="/img/loading.gif" lazyload alt="image-20220720154305858"></p>
+<p>当去访问一个不存在的文件a.html</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720154327199.png" srcset="/img/loading.gif" lazyload alt="image-20220720154327199"></p>
+<p>cgi问题</p>
+<p>这里写一个简单的shell cgi来替代自带的cgi</p>
+<div class="code-wrapper"><pre><code class="hljs sh"><span class="hljs-meta">#!/bin/bash</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Content-Type: text/html&quot;</span>
+<span class="hljs-built_in">echo</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;HTML&gt;&lt;BODY&gt;&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;CENTER&gt;Today is:&lt;/CENTER&gt;&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;CENTER&gt;&lt;B&gt;&quot;</span>
+<span class="hljs-built_in">date</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;/B&gt;&lt;/CENTER&gt;&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;/BODY&gt;&lt;/HTML&gt;&quot;</span></code></pre></div>
+
+<p>访问cgi文件，发现cgi并未被执行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720160433477.png" srcset="/img/loading.gif" lazyload alt="image-20220720160433477"></p>
+<p>是因为没有执行权限，所以导致直接被当成静态文件，而有执行权限的话，静态文件也会被当作cgi执行。</p>
+<p>尝试将所有的文件赋予权限</p>
+<blockquote>
+<p>chmod 777 .&#x2F;*</p>
+</blockquote>
+<p>index页面无法正常显示</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720155641576.png" srcset="/img/loading.gif" lazyload alt="image-20220720155641576"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720160541100.png" srcset="/img/loading.gif" lazyload alt="image-20220720160541100"></p>
+<p>执行方式可以通过下图来理解</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/image-20220720152650036.png" srcset="/img/loading.gif" lazyload alt="image-20220720152650036"></p>
+<h2 id="注释代码"><a href="#注释代码" class="headerlink" title="注释代码"></a>注释代码</h2><p>项目放代码阅读时的代码放gitee了需要可自行下载：<a target="_blank" rel="noopener" href="https://gitee.com/p1piyang/backward-analysis/">https://gitee.com/p1piyang/backward-analysis/</a></p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">/* J. David&#x27;s webserver */</span>
+<span class="hljs-comment">/* This is a simple webserver.</span>
+<span class="hljs-comment"> * Created November 1999 by J. David Blackstone.</span>
+<span class="hljs-comment"> * CSE 4344 (Network concepts), Prof. Zeigler</span>
+<span class="hljs-comment"> * University of Texas at Arlington</span>
+<span class="hljs-comment"> */</span>
+<span class="hljs-comment">/* This program compiles for Sparc Solaris 2.6.</span>
+<span class="hljs-comment"> * To compile for Linux:</span>
+<span class="hljs-comment"> *  1) Comment out the #include &lt;pthread.h&gt; line.</span>
+<span class="hljs-comment"> *  2) Comment out the line that defines the variable newthread.</span>
+<span class="hljs-comment"> *  3) Comment out the two lines that run pthread_create().</span>
+<span class="hljs-comment"> *  4) Uncomment the line that runs accept_request().</span>
+<span class="hljs-comment"> *  5) Remove -lsocket from the Makefile.</span>
+<span class="hljs-comment"> */</span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/socket.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;netinet/in.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;arpa/inet.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;ctype.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;strings.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/stat.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;pthread.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/wait.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> ISspace(x) isspace((int)(x))</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> SERVER_STRING <span class="hljs-string">&quot;Server: jdbhttpd/0.1.0\r\n&quot;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> STDIN   0</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> STDOUT  1</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> STDERR  2</span>
+
+<span class="hljs-type">void</span> <span class="hljs-title function_">accept_request</span><span class="hljs-params">(<span class="hljs-type">void</span> *)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">bad_request</span><span class="hljs-params">(<span class="hljs-type">int</span>)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">cat</span><span class="hljs-params">(<span class="hljs-type">int</span>, FILE *)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">cannot_execute</span><span class="hljs-params">(<span class="hljs-type">int</span>)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">error_die</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">execute_cgi</span><span class="hljs-params">(<span class="hljs-type">int</span>, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *)</span>;
+<span class="hljs-type">int</span> <span class="hljs-title function_">get_line</span><span class="hljs-params">(<span class="hljs-type">int</span>, <span class="hljs-type">char</span> *, <span class="hljs-type">int</span>)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">headers</span><span class="hljs-params">(<span class="hljs-type">int</span>, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">not_found</span><span class="hljs-params">(<span class="hljs-type">int</span>)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">serve_file</span><span class="hljs-params">(<span class="hljs-type">int</span>, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *)</span>;
+<span class="hljs-type">int</span> <span class="hljs-title function_">startup</span><span class="hljs-params">(u_short *)</span>;
+<span class="hljs-type">void</span> <span class="hljs-title function_">unimplemented</span><span class="hljs-params">(<span class="hljs-type">int</span>)</span>;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* A request has caused a call to accept() on the server port to</span>
+<span class="hljs-comment"> * return.  Process the request appropriately.</span>
+<span class="hljs-comment"> * Parameters: the socket connected to the client */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">accept_request</span><span class="hljs-params">(<span class="hljs-type">void</span> *arg)</span>
+&#123;
+    <span class="hljs-type">int</span> client = (<span class="hljs-type">intptr_t</span>)arg;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+    <span class="hljs-type">size_t</span> numchars;
+    <span class="hljs-type">char</span> method[<span class="hljs-number">255</span>];
+    <span class="hljs-type">char</span> url[<span class="hljs-number">255</span>];
+    <span class="hljs-type">char</span> path[<span class="hljs-number">512</span>];
+    <span class="hljs-type">size_t</span> i, j;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">stat</span> <span class="hljs-title">st</span>;</span> <span class="hljs-comment">//文件信息</span>
+    <span class="hljs-comment">//struct stat&#123;</span>
+        <span class="hljs-comment">//   dev_t     st_dev;     /* ID of device containing file */文件使用的设备号</span>
+        <span class="hljs-comment">//   ino_t     st_ino;     /* inode number */    索引节点号 </span>
+        <span class="hljs-comment">//   mode_t    st_mode;    /* protection */  文件对应的模式，文件，目录等</span>
+        <span class="hljs-comment">//   nlink_t   st_nlink;   /* number of hard links */    文件的硬连接数  </span>
+        <span class="hljs-comment">//   uid_t     st_uid;     /* user ID of owner */    所有者用户识别号</span>
+        <span class="hljs-comment">//   gid_t     st_gid;     /* group ID of owner */   组识别号  </span>
+        <span class="hljs-comment">//   dev_t     st_rdev;    /* device ID (if special file) */ 设备文件的设备号</span>
+        <span class="hljs-comment">//   off_t     st_size;    /* total size, in bytes */ 以字节为单位的文件容量   </span>
+        <span class="hljs-comment">//   blksize_t st_blksize; /* blocksize for file system I/O */ 包含该文件的磁盘块的大小   </span>
+        <span class="hljs-comment">//   blkcnt_t  st_blocks;  /* number of 512B blocks allocated */ 该文件所占的磁盘块  </span>
+        <span class="hljs-comment">//   time_t    st_atime;   /* time of last access */ 最后一次访问该文件的时间   </span>
+        <span class="hljs-comment">//   time_t    st_mtime;   /* time of last modification */ /最后一次修改该文件的时间   </span>
+        <span class="hljs-comment">//   time_t    st_ctime;   /* time of last status change */ 最后一次改变该文件状态的时间   </span>
+        <span class="hljs-comment">//&#125;;</span>
+
+    <span class="hljs-type">int</span> cgi = <span class="hljs-number">0</span>;      <span class="hljs-comment">/* becomes true if server decides this is a CGI</span>
+<span class="hljs-comment">                       * program */</span>
+    <span class="hljs-type">char</span> *query_string = <span class="hljs-literal">NULL</span>;
+    <span class="hljs-comment">//读取http请求的第一行数据</span>
+    numchars = get_line(client, buf, <span class="hljs-keyword">sizeof</span>(buf));
+    i = <span class="hljs-number">0</span>; j = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">//吧请求方法存到，，method中</span>
+    <span class="hljs-keyword">while</span> (!ISspace(buf[i]) &amp;&amp; (i &lt; <span class="hljs-keyword">sizeof</span>(method) - <span class="hljs-number">1</span>))
+    &#123;
+        method[i] = buf[i];
+        i++;
+    &#125;
+    j=i;
+    method[i] = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    <span class="hljs-comment">//判断如果不是get或者post方法，发送response给客户端表示无法实现</span>
+    <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;GET&quot;</span>) &amp;&amp; strcasecmp(method, <span class="hljs-string">&quot;POST&quot;</span>))
+    &#123;
+        <span class="hljs-comment">//使用sprintf函数将要返回的内容给buf,使用send函数返回给client</span>
+        unimplemented(client);
+        <span class="hljs-keyword">return</span>;
+    &#125;
+    <span class="hljs-comment">//判断为post方法</span>
+    <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;POST&quot;</span>) == <span class="hljs-number">0</span>)
+        cgi = <span class="hljs-number">1</span>;
+
+    i = <span class="hljs-number">0</span>;
+    <span class="hljs-comment">//跳过空格</span>
+    <span class="hljs-keyword">while</span> (ISspace(buf[j]) &amp;&amp; (j &lt; numchars))
+        j++;
+    <span class="hljs-comment">//获取url</span>
+    <span class="hljs-keyword">while</span> (!ISspace(buf[j]) &amp;&amp; (i &lt; <span class="hljs-keyword">sizeof</span>(url) - <span class="hljs-number">1</span>) &amp;&amp; (j &lt; numchars))
+    &#123;
+        url[i] = buf[j];
+        i++; j++;
+    &#125;
+    url[i] = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    <span class="hljs-comment">//get方法</span>
+    <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;GET&quot;</span>) == <span class="hljs-number">0</span>)
+    &#123;
+        query_string = url;
+        <span class="hljs-comment">//用于记录带参数的GET方法请求中 ‘？’后的参数</span>
+        <span class="hljs-keyword">while</span> ((*query_string != <span class="hljs-string">&#x27;?&#x27;</span>) &amp;&amp; (*query_string != <span class="hljs-string">&#x27;\0&#x27;</span>))
+            query_string++;
+        <span class="hljs-keyword">if</span> (*query_string == <span class="hljs-string">&#x27;?&#x27;</span>)
+        &#123;
+            cgi = <span class="hljs-number">1</span>;
+            *query_string = <span class="hljs-string">&#x27;\0&#x27;</span>;
+            query_string++;
+        &#125;
+    &#125;
+    <span class="hljs-comment">//将htdocs与url拼接到一起给path，即我们的资源文件都在htdocs下</span>
+    <span class="hljs-built_in">sprintf</span>(path, <span class="hljs-string">&quot;htdocs%s&quot;</span>, url);
+    <span class="hljs-comment">//判断如果URL的最后一位是‘/’，加上index.html</span>
+    <span class="hljs-keyword">if</span> (path[<span class="hljs-built_in">strlen</span>(path) - <span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;/&#x27;</span>)
+        <span class="hljs-built_in">strcat</span>(path, <span class="hljs-string">&quot;index.html&quot;</span>);
+
+    <span class="hljs-comment">//定义函数：int stat(const char * file_name, struct stat *buf);</span>
+    <span class="hljs-comment">//函数说明：stat()用来将参数file_name 所指的文件状态, 复制到参数buf 所指的结构中。</span>
+    <span class="hljs-comment">//返回值：执行成功则返回0，失败返回-1，错误代码存于errno。 </span>
+    <span class="hljs-comment">//这里改了一下，把东西处理下可以看到是处理包头。</span>
+    <span class="hljs-comment">//根据执行来看，这个if判断</span>
+    <span class="hljs-keyword">if</span> (stat(path, &amp;st) == <span class="hljs-number">-1</span>) &#123;
+        <span class="hljs-keyword">while</span> ((numchars &gt; <span class="hljs-number">0</span>) &amp;&amp; <span class="hljs-built_in">strcmp</span>(<span class="hljs-string">&quot;\n&quot;</span>, buf))  <span class="hljs-comment">/* read &amp; discard headers */</span>
+        &#123;
+            numchars = get_line(client, buf, <span class="hljs-keyword">sizeof</span>(buf));
+            <span class="hljs-type">char</span> *test = buf;
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;for: %s&quot;</span>, test);
+        &#125;
+        <span class="hljs-comment">//打印404返回页面</span>
+        not_found(client);
+    &#125;
+    <span class="hljs-keyword">else</span>
+    &#123;
+        <span class="hljs-comment">// 文件存在，那则跟常量S_IFMT相与，相与之后的值可以用来判断该文件是什么类型的</span>
+        <span class="hljs-comment">// 此处与上边判断路径是不是以 \ 结尾的地方作用一样，可以省略，留着可重复确认。</span>
+        <span class="hljs-keyword">if</span> ((st.st_mode &amp; S_IFMT) == S_IFDIR)
+            <span class="hljs-built_in">strcat</span>(path, <span class="hljs-string">&quot;/index.html&quot;</span>);
+        <span class="hljs-comment">//判断权限的，前面有说过的</span>
+        <span class="hljs-keyword">if</span> ((st.st_mode &amp; S_IXUSR) ||
+                (st.st_mode &amp; S_IXGRP) ||
+                (st.st_mode &amp; S_IXOTH)    )
+            cgi = <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">if</span> (!cgi)
+        &#123;
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;nocgi\n&quot;</span>);
+            <span class="hljs-comment">//不需要cgi的</span>
+            serve_file(client, path);
+        &#125;
+        <span class="hljs-keyword">else</span>
+        &#123;
+            <span class="hljs-comment">//需要cgi的</span>
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;cgi\n&quot;</span>);
+            execute_cgi(client, path, method, query_string);
+        &#125;
+    &#125;
+
+    close(client);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Inform the client that a request it has made has a problem.</span>
+<span class="hljs-comment"> * Parameters: client socket */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">bad_request</span><span class="hljs-params">(<span class="hljs-type">int</span> client)</span>
+&#123;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;HTTP/1.0 400 BAD REQUEST\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;Content-type: text/html\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;P&gt;Your browser sent a bad request, &quot;</span>);
+    send(client, buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;such as a POST without a Content-Length.\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-keyword">sizeof</span>(buf), <span class="hljs-number">0</span>);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Put the entire contents of a file out on a socket.  This function</span>
+<span class="hljs-comment"> * is named after the UNIX &quot;cat&quot; command, because it might have been</span>
+<span class="hljs-comment"> * easier just to do something like pipe, fork, and exec(&quot;cat&quot;).</span>
+<span class="hljs-comment"> * Parameters: the client socket descriptor</span>
+<span class="hljs-comment"> *             FILE pointer for the file to cat */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">cat</span><span class="hljs-params">(<span class="hljs-type">int</span> client, FILE *resource)</span>
+&#123;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+    <span class="hljs-comment">//读取文件内容，发送到前端。</span>
+    fgets(buf, <span class="hljs-keyword">sizeof</span>(buf), resource);
+    <span class="hljs-keyword">while</span> (!feof(resource))
+    &#123;
+        send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+        fgets(buf, <span class="hljs-keyword">sizeof</span>(buf), resource);
+    &#125;
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Inform the client that a CGI script could not be executed.</span>
+<span class="hljs-comment"> * Parameter: the client socket descriptor. */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">cannot_execute</span><span class="hljs-params">(<span class="hljs-type">int</span> client)</span>
+&#123;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;HTTP/1.0 500 Internal Server Error\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;Content-type: text/html\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;P&gt;Error prohibited CGI execution.\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Print out an error message with perror() (for system errors; based</span>
+<span class="hljs-comment"> * on value of errno, which indicates system call errors) and exit the</span>
+<span class="hljs-comment"> * program indicating an error. */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">error_die</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *sc)</span>
+&#123;
+    perror(sc);
+    <span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Execute a CGI script.  Will need to set environment variables as</span>
+<span class="hljs-comment"> * appropriate.</span>
+<span class="hljs-comment"> * Parameters: client socket descriptor</span>
+<span class="hljs-comment"> *             path to the CGI script */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+ <span class="hljs-comment">// cgi用于动态网页的处理</span>
+ <span class="hljs-comment">// execute_cgi函数创建了两个进程，子进程用于cgi文件的处理，父进程用于往socket读写数据</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">execute_cgi</span><span class="hljs-params">(<span class="hljs-type">int</span> client, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *path,</span>
+<span class="hljs-params">        <span class="hljs-type">const</span> <span class="hljs-type">char</span> *method, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *query_string)</span>
+&#123;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+    <span class="hljs-type">int</span> cgi_output[<span class="hljs-number">2</span>];
+    <span class="hljs-type">int</span> cgi_input[<span class="hljs-number">2</span>];
+    <span class="hljs-type">pid_t</span> pid;
+    <span class="hljs-type">int</span> status;
+    <span class="hljs-type">int</span> i;
+    <span class="hljs-type">char</span> c;
+    <span class="hljs-type">int</span> numchars = <span class="hljs-number">1</span>;
+    <span class="hljs-type">int</span> content_length = <span class="hljs-number">-1</span>;
+    buf[<span class="hljs-number">0</span>] = <span class="hljs-string">&#x27;A&#x27;</span>; buf[<span class="hljs-number">1</span>] = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;&gt;exec cgi\n&quot;</span>);
+    <span class="hljs-comment">//get方法</span>
+    <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;GET&quot;</span>) == <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">while</span> ((numchars &gt; <span class="hljs-number">0</span>) &amp;&amp; <span class="hljs-built_in">strcmp</span>(<span class="hljs-string">&quot;\n&quot;</span>, buf)) <span class="hljs-comment">/* read &amp; discard headers */</span>
+        &#123; 
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;&gt;get\n&quot;</span>);
+            numchars = get_line(client, buf, <span class="hljs-keyword">sizeof</span>(buf));
+        &#125;
+    <span class="hljs-comment">//post方法</span>
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;POST&quot;</span>) == <span class="hljs-number">0</span>) <span class="hljs-comment">/*POST*/</span>
+    &#123;
+        
+        numchars = get_line(client, buf, <span class="hljs-keyword">sizeof</span>(buf));
+        <span class="hljs-keyword">while</span> ((numchars &gt; <span class="hljs-number">0</span>) &amp;&amp; <span class="hljs-built_in">strcmp</span>(<span class="hljs-string">&quot;\n&quot;</span>, buf))
+        &#123;
+            <span class="hljs-comment">// &quot;Content-Length:&quot;长度为15个字符，所以将前15个字符比较。 </span>
+            buf[<span class="hljs-number">15</span>] = <span class="hljs-string">&#x27;\0&#x27;</span>;
+            <span class="hljs-comment">// 如果是Content-Length，读取这个改字段转为整数</span>
+            <span class="hljs-keyword">if</span> (strcasecmp(buf, <span class="hljs-string">&quot;Content-Length:&quot;</span>) == <span class="hljs-number">0</span>)
+            &#123;
+                content_length = atoi(&amp;(buf[<span class="hljs-number">16</span>]));
+                <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;lenght:%d\n&quot;</span>,content_length);
+            &#125;
+            numchars = get_line(client, buf, <span class="hljs-keyword">sizeof</span>(buf));
+        &#125;
+        <span class="hljs-comment">//无法处理的话，400错误</span>
+        <span class="hljs-keyword">if</span> (content_length == <span class="hljs-number">-1</span>) &#123;
+            bad_request(client);
+            <span class="hljs-keyword">return</span>;
+        &#125;
+    &#125;
+    <span class="hljs-keyword">else</span><span class="hljs-comment">/*HEAD or other*/</span>
+    &#123;
+    &#125;
+
+    <span class="hljs-comment">//创建管道</span>
+
+    <span class="hljs-comment">//子进程写管道</span>
+    <span class="hljs-keyword">if</span> (pipe(cgi_output) &lt; <span class="hljs-number">0</span>) &#123;
+        <span class="hljs-comment">//服务错误500</span>
+        cannot_execute(client);
+        <span class="hljs-keyword">return</span>;
+    &#125;
+    <span class="hljs-comment">//子进程写管道</span>
+    <span class="hljs-keyword">if</span> (pipe(cgi_input) &lt; <span class="hljs-number">0</span>) &#123;
+        <span class="hljs-comment">//服务错误500</span>
+        cannot_execute(client);
+        <span class="hljs-keyword">return</span>;
+    &#125;
+
+    <span class="hljs-comment">//创建子进程</span>
+    <span class="hljs-keyword">if</span> ( (pid = fork()) &lt; <span class="hljs-number">0</span> ) &#123;
+        cannot_execute(client);
+        <span class="hljs-keyword">return</span>;
+    &#125;
+    <span class="hljs-comment">//响应成功</span>
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;HTTP/1.0 200 OK\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-comment">// 这下面是另一个坑，进程通信。</span>
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>)  <span class="hljs-comment">/* child: CGI script */</span>
+    &#123;
+        <span class="hljs-type">char</span> meth_env[<span class="hljs-number">255</span>];
+        <span class="hljs-type">char</span> query_env[<span class="hljs-number">255</span>];
+        <span class="hljs-type">char</span> length_env[<span class="hljs-number">255</span>];
+
+        dup2(cgi_output[<span class="hljs-number">1</span>], STDOUT);
+        dup2(cgi_input[<span class="hljs-number">0</span>], STDIN);
+        close(cgi_output[<span class="hljs-number">0</span>]);
+        close(cgi_input[<span class="hljs-number">1</span>]);
+        <span class="hljs-built_in">sprintf</span>(meth_env, <span class="hljs-string">&quot;REQUEST_METHOD=%s&quot;</span>, method);
+        putenv(meth_env);
+        <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;GET&quot;</span>) == <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-built_in">sprintf</span>(query_env, <span class="hljs-string">&quot;QUERY_STRING=%s&quot;</span>, query_string);
+            putenv(query_env);
+        &#125;
+        <span class="hljs-keyword">else</span> &#123;   <span class="hljs-comment">/* POST */</span>
+            <span class="hljs-built_in">sprintf</span>(length_env, <span class="hljs-string">&quot;CONTENT_LENGTH=%d&quot;</span>, content_length);
+            putenv(length_env);
+        &#125;
+        execl(path, <span class="hljs-literal">NULL</span>);
+        <span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>);
+    &#125; <span class="hljs-keyword">else</span> &#123;    <span class="hljs-comment">/* parent */</span>
+        close(cgi_output[<span class="hljs-number">1</span>]);
+        close(cgi_input[<span class="hljs-number">0</span>]);
+        <span class="hljs-keyword">if</span> (strcasecmp(method, <span class="hljs-string">&quot;POST&quot;</span>) == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; content_length; i++) &#123;
+                recv(client, &amp;c, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+                write(cgi_input[<span class="hljs-number">1</span>], &amp;c, <span class="hljs-number">1</span>);
+            &#125;
+        <span class="hljs-keyword">while</span> (read(cgi_output[<span class="hljs-number">0</span>], &amp;c, <span class="hljs-number">1</span>) &gt; <span class="hljs-number">0</span>)
+            send(client, &amp;c, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+
+        close(cgi_output[<span class="hljs-number">0</span>]);
+        close(cgi_input[<span class="hljs-number">1</span>]);
+        waitpid(pid, &amp;status, <span class="hljs-number">0</span>);
+    &#125;
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Get a line from a socket, whether the line ends in a newline,</span>
+<span class="hljs-comment"> * carriage return, or a CRLF combination.  Terminates the string read</span>
+<span class="hljs-comment"> * with a null character.  If no newline indicator is found before the</span>
+<span class="hljs-comment"> * end of the buffer, the string is terminated with a null.  If any of</span>
+<span class="hljs-comment"> * the above three line terminators is read, the last character of the</span>
+<span class="hljs-comment"> * string will be a linefeed and the string will be terminated with a</span>
+<span class="hljs-comment"> * null character.</span>
+<span class="hljs-comment"> * Parameters: the socket descriptor</span>
+<span class="hljs-comment"> *             the buffer to save the data in</span>
+<span class="hljs-comment"> *             the size of the buffer</span>
+<span class="hljs-comment"> * Returns: the number of bytes stored (excluding null) */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">//处理包，大概流程是循环读取每个字符</span>
+<span class="hljs-comment">//如果回车符(\r)的后面不是换行符(\n)或者读取失败就把当前读取的字符置为换行，从而终止循环</span>
+<span class="hljs-comment">//如果没有成功接收到字符，以 \n 结尾，结束循环</span>
+<span class="hljs-comment">//最后以\n结尾</span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">get_line</span><span class="hljs-params">(<span class="hljs-type">int</span> sock, <span class="hljs-type">char</span> *buf, <span class="hljs-type">int</span> size)</span>
+&#123;
+    <span class="hljs-type">int</span> i = <span class="hljs-number">0</span>;
+    <span class="hljs-type">char</span> c = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    <span class="hljs-type">int</span> n;
+    <span class="hljs-comment">//</span>
+    <span class="hljs-keyword">while</span> ((i &lt; size - <span class="hljs-number">1</span>) &amp;&amp; (c != <span class="hljs-string">&#x27;\n&#x27;</span>))
+    &#123;
+        n = recv(sock, &amp;c, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+        <span class="hljs-comment">/* DEBUG printf(&quot;%02X\n&quot;, c); */</span>
+        <span class="hljs-keyword">if</span> (n &gt; <span class="hljs-number">0</span>)
+        &#123;
+            <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\r&#x27;</span>)
+            &#123;
+                n = recv(sock, &amp;c, <span class="hljs-number">1</span>, MSG_PEEK);
+                <span class="hljs-comment">/* DEBUG printf(&quot;%02X\n&quot;, c); */</span>
+                <span class="hljs-keyword">if</span> ((n &gt; <span class="hljs-number">0</span>) &amp;&amp; (c == <span class="hljs-string">&#x27;\n&#x27;</span>))
+                    recv(sock, &amp;c, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+                <span class="hljs-keyword">else</span>
+                    c = <span class="hljs-string">&#x27;\n&#x27;</span>;
+            &#125;
+            buf[i] = c;
+            i++;
+        &#125;
+        <span class="hljs-keyword">else</span>
+            c = <span class="hljs-string">&#x27;\n&#x27;</span>;
+    &#125;
+    buf[i] = <span class="hljs-string">&#x27;\0&#x27;</span>;
+
+    <span class="hljs-keyword">return</span>(i);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Return the informational HTTP headers about a file. */</span>
+<span class="hljs-comment">/* Parameters: the socket to print the headers on</span>
+<span class="hljs-comment"> *             the name of the file */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">//响应头</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">headers</span><span class="hljs-params">(<span class="hljs-type">int</span> client, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *filename)</span>
+&#123;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+    (<span class="hljs-type">void</span>)filename;  <span class="hljs-comment">/* could use filename to determine file type */</span>
+
+    <span class="hljs-built_in">strcpy</span>(buf, <span class="hljs-string">&quot;HTTP/1.0 200 OK\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">strcpy</span>(buf, SERVER_STRING);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;Content-Type: text/html\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">strcpy</span>(buf, <span class="hljs-string">&quot;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Give a client a 404 not found status message. */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">not_found</span><span class="hljs-params">(<span class="hljs-type">int</span> client)</span>
+&#123;
+    <span class="hljs-comment">//将内容打印到缓存，并且发送出去</span>
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;HTTP/1.0 404 NOT FOUND\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, SERVER_STRING);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;Content-Type: text/html\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;HTML&gt;&lt;TITLE&gt;Not Found&lt;/TITLE&gt;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;BODY&gt;&lt;P&gt;The server could not fulfill\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;your request because the resource specified\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;is unavailable or nonexistent.\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Send a regular file to the client.  Use headers, and report</span>
+<span class="hljs-comment"> * errors to client if they occur.</span>
+<span class="hljs-comment"> * Parameters: a pointer to a file structure produced from the socket</span>
+<span class="hljs-comment"> *              file descriptor</span>
+<span class="hljs-comment"> *             the name of the file to serve */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">serve_file</span><span class="hljs-params">(<span class="hljs-type">int</span> client, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *filename)</span>
+&#123;
+    FILE *resource = <span class="hljs-literal">NULL</span>;
+    <span class="hljs-type">int</span> numchars = <span class="hljs-number">1</span>;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+
+    buf[<span class="hljs-number">0</span>] = <span class="hljs-string">&#x27;A&#x27;</span>; buf[<span class="hljs-number">1</span>] = <span class="hljs-string">&#x27;\0&#x27;</span>;
+    <span class="hljs-keyword">while</span> ((numchars &gt; <span class="hljs-number">0</span>) &amp;&amp; <span class="hljs-built_in">strcmp</span>(<span class="hljs-string">&quot;\n&quot;</span>, buf))  <span class="hljs-comment">/* read &amp; discard headers */</span>
+        numchars = get_line(client, buf, <span class="hljs-keyword">sizeof</span>(buf));
+    <span class="hljs-comment">//打开文件，判断是否有文件</span>
+    resource = fopen(filename, <span class="hljs-string">&quot;r&quot;</span>);
+    <span class="hljs-keyword">if</span> (resource == <span class="hljs-literal">NULL</span>)
+        not_found(client);
+    <span class="hljs-keyword">else</span>
+    &#123;
+        <span class="hljs-comment">//构造响应头给客户端</span>
+        headers(client, filename);
+        <span class="hljs-comment">//将文件内容发送给客户端</span>
+        cat(client, resource);
+    &#125;
+    fclose(resource);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* This function starts the process of listening for web connections</span>
+<span class="hljs-comment"> * on a specified port.  If the port is 0, then dynamically allocate a</span>
+<span class="hljs-comment"> * port and modify the original port variable to reflect the actual</span>
+<span class="hljs-comment"> * port.</span>
+<span class="hljs-comment"> * Parameters: pointer to variable containing the port to connect on</span>
+<span class="hljs-comment"> * Returns: the socket */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">//初始化 httpd 服务，包括建立套接字，绑定端口，进行监听等。</span>
+<span class="hljs-type">int</span> <span class="hljs-title function_">startup</span><span class="hljs-params">(u_short *port)</span>
+&#123;
+    <span class="hljs-type">int</span> httpd = <span class="hljs-number">0</span>;
+    <span class="hljs-type">int</span> on = <span class="hljs-number">1</span>;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sockaddr_in</span> <span class="hljs-title">name</span>;</span>
+    <span class="hljs-comment">//正常的socket创建流程</span>
+    httpd = socket(PF_INET, SOCK_STREAM, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">if</span> (httpd == <span class="hljs-number">-1</span>)
+        error_die(<span class="hljs-string">&quot;socket&quot;</span>);
+    <span class="hljs-built_in">memset</span>(&amp;name, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(name));
+    name.sin_family = AF_INET;
+    name.sin_port = htons(*port);
+    name.sin_addr.s_addr = htonl(INADDR_ANY);
+    <span class="hljs-comment">//setsockopt()函数，用于任意类型、任意状态套接口的设置选项值 </span>
+    <span class="hljs-keyword">if</span> ((setsockopt(httpd, SOL_SOCKET, SO_REUSEADDR, &amp;on, <span class="hljs-keyword">sizeof</span>(on))) &lt; <span class="hljs-number">0</span>)  
+    &#123;  
+        error_die(<span class="hljs-string">&quot;setsockopt failed&quot;</span>);
+    &#125;
+    <span class="hljs-comment">//绑定socket到端口，port等于0，系统会随机分配一个端口（bind函数里实现）</span>
+    <span class="hljs-keyword">if</span> (bind(httpd, (<span class="hljs-keyword">struct</span> sockaddr *)&amp;name, <span class="hljs-keyword">sizeof</span>(name)) &lt; <span class="hljs-number">0</span>)
+        error_die(<span class="hljs-string">&quot;bind&quot;</span>);
+    <span class="hljs-comment">// 这个if的作用是将自动分配的端口传给port</span>
+    <span class="hljs-keyword">if</span> (*port == <span class="hljs-number">0</span>)  <span class="hljs-comment">/* if dynamically allocating a port */</span>
+    &#123;
+        <span class="hljs-type">socklen_t</span> namelen = <span class="hljs-keyword">sizeof</span>(name);
+          <span class="hljs-comment">// 获取socket绑定的地址信息</span>
+        <span class="hljs-keyword">if</span> (getsockname(httpd, (<span class="hljs-keyword">struct</span> sockaddr *)&amp;name, &amp;namelen) == <span class="hljs-number">-1</span>)
+            error_die(<span class="hljs-string">&quot;getsockname&quot;</span>);
+        *port = ntohs(name.sin_port);
+    &#125;
+    <span class="hljs-comment">//监听端口</span>
+    <span class="hljs-keyword">if</span> (listen(httpd, <span class="hljs-number">5</span>) &lt; <span class="hljs-number">0</span>)
+        error_die(<span class="hljs-string">&quot;listen&quot;</span>);
+    <span class="hljs-keyword">return</span>(httpd);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-comment">/* Inform the client that the requested web method has not been</span>
+<span class="hljs-comment"> * implemented.</span>
+<span class="hljs-comment"> * Parameter: the client socket */</span>
+<span class="hljs-comment">/**********************************************************************/</span>
+<span class="hljs-type">void</span> <span class="hljs-title function_">unimplemented</span><span class="hljs-params">(<span class="hljs-type">int</span> client)</span>
+&#123;
+    <span class="hljs-type">char</span> buf[<span class="hljs-number">1024</span>];
+
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;HTTP/1.0 501 guan zhu jia ran, dun dun jie chan\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, SERVER_STRING);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;Content-Type: text/html\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;Method Not Implemented\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;/TITLE&gt;&lt;/HEAD&gt;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;BODY&gt;&lt;P&gt;if you watch this page, please follow JiaRan_Diana.\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;br/&gt;&lt;img src=&#x27;https://img2.baidu.com/it/u=2323296913,2613522307&amp;amp;fm=253&amp;amp;app=138&amp;amp;size=w931&amp;amp;n=0&amp;amp;f=JPEG&amp;amp;fmt=auto?sec=1658854800&amp;amp;t=7b90c5387e83fb57a89e051eccbb7eb9&#x27;&gt;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">sprintf</span>(buf, <span class="hljs-string">&quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;</span>);
+    send(client, buf, <span class="hljs-built_in">strlen</span>(buf), <span class="hljs-number">0</span>);
+&#125;
+
+<span class="hljs-comment">/**********************************************************************/</span>
+
+<span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span>
+&#123;
+    <span class="hljs-type">int</span> server_sock = <span class="hljs-number">-1</span>; <span class="hljs-comment">//服务端套接字接口</span>
+    u_short port = <span class="hljs-number">4000</span>; <span class="hljs-comment">//端口</span>
+    <span class="hljs-type">int</span> client_sock = <span class="hljs-number">-1</span>;<span class="hljs-comment">//已连接套接字描述符，初始化为-1（客户端）</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sockaddr_in</span> <span class="hljs-title">client_name</span>;</span> 
+    <span class="hljs-type">socklen_t</span>  client_name_len = <span class="hljs-keyword">sizeof</span>(client_name);
+    <span class="hljs-type">pthread_t</span> newthread;
+    
+    <span class="hljs-comment">//调用startup()函数，建立一个监听套接字，在对应的端口建立httpd服务</span>
+    server_sock = startup(&amp;port);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;httpd running on port %d\n&quot;</span>, port);
+
+    <span class="hljs-comment">//循环调用accept()函数来等待客户端的连接，accept()会议阻塞的方式运行</span>
+    <span class="hljs-comment">//有客户端链接后返回到client_sock，去创建新线程处理请求</span>
+    <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>)
+    &#123;
+        client_sock = accept(server_sock, (<span class="hljs-keyword">struct</span> sockaddr *)&amp;client_name, &amp;client_name_len);
+        <span class="hljs-keyword">if</span> (client_sock == <span class="hljs-number">-1</span>)
+            error_die(<span class="hljs-string">&quot;accept&quot;</span>);
+        <span class="hljs-comment">//创建新线程用accept_request()函数处理新请求，同时将客户端socket作为参数传过去</span>
+        <span class="hljs-comment">/* accept_request(&amp;client_sock); */</span>
+        <span class="hljs-keyword">if</span> (pthread_create(&amp;newthread , <span class="hljs-literal">NULL</span>, (<span class="hljs-type">void</span> *)accept_request, (<span class="hljs-type">void</span> *)(<span class="hljs-type">intptr_t</span>)client_sock) != <span class="hljs-number">0</span>)
+            perror(<span class="hljs-string">&quot;pthread_create&quot;</span>);
+    &#125;
+
+    close(server_sock);
+
+    <span class="hljs-keyword">return</span>(<span class="hljs-number">0</span>);
+&#125;
+
+</code></pre></div>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/iot/" class="category-chain-item">iot</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>协议-tinyhttpd</div>
+      <div>http://example.com/article/68d281b.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>p1yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 1, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/article/ccd0d78.html" title="协议-rtsp">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">协议-rtsp</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/article/9ff79b23.html" title="关于我">
+                        <span class="hidden-mobile">关于我</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://p1yang.github.io" target="_blank" rel="nofollow noopener"><span>p1yang</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

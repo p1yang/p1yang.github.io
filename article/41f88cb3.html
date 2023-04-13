@@ -1,0 +1,664 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="p1yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="关于加密前期接触iot我们遇到固件基本都是binwalk一把梭，但有时候会遇到固件信息混乱，或者分析出来一堆zlma的文件，没有发现有rtos或者文件系统的标志。 这时候会考虑到是否加密，上网查会发现有用 binwalk 的 -E 参数来判断。 那么这个判断的原理是啥？ 原理是信息熵。   熵：泛指某些物质系统状态的一种量度，某些物质系统状态可能出现的程度。  初高中应该都学过，熵值越大，说明系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iot学习感悟">
+<meta property="og:url" content="http://example.com/article/41f88cb3.html">
+<meta property="og:site_name" content="p1yang">
+<meta property="og:description" content="关于加密前期接触iot我们遇到固件基本都是binwalk一把梭，但有时候会遇到固件信息混乱，或者分析出来一堆zlma的文件，没有发现有rtos或者文件系统的标志。 这时候会考虑到是否加密，上网查会发现有用 binwalk 的 -E 参数来判断。 那么这个判断的原理是啥？ 原理是信息熵。   熵：泛指某些物质系统状态的一种量度，某些物质系统状态可能出现的程度。  初高中应该都学过，熵值越大，说明系统">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140534018.png">
+<meta property="article:published_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:author" content="p1yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140534018.png">
+  
+  
+  
+  <title>iot学习感悟 - p1yang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>p1yang&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="iot学习感悟"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-07-20 17:57" pubdate>
+          July 20, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">iot学习感悟</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="关于加密"><a href="#关于加密" class="headerlink" title="关于加密"></a>关于加密</h1><p>前期接触iot我们遇到固件基本都是binwalk一把梭，但有时候会遇到固件信息混乱，或者分析出来一堆zlma的文件，没有发现有rtos或者文件系统的标志。</p>
+<p>这时候会考虑到是否加密，上网查会发现有用 binwalk 的 -E 参数来判断。</p>
+<p>那么这个判断的原理是啥？</p>
+<p>原理是信息熵。</p>
+<blockquote>
+<p> 熵：泛指某些物质系统状态的一种量度，某些物质系统状态可能出现的程度。</p>
+</blockquote>
+<p>初高中应该都学过，熵值越大，说明系统越混乱。</p>
+<blockquote>
+<p> 信息熵：1948年C.E.Shannon（香农）从热力学中借用过来提出的概念，解决了对信息的量化度量问题</p>
+</blockquote>
+<p>信息中，重复的内容越多，系统越稳定，能获得的信息越多。</p>
+<blockquote>
+<p>对于没有加密的二进制文件来说，某些指令出现的频率通常很高（如序言、nop序列等），并且数据结构几乎没有随机性。重复概率很高</p>
+</blockquote>
+<p>所以，对于未加密的数据来说熵值一般会比较低。</p>
+<blockquote>
+<p>对于经过加密的文件来说，都会想尽办法隐藏自己的信息，而导致很少有重复的内容，也就导致重复概率低</p>
+</blockquote>
+<p>所以，加密的熵值一般都会高。</p>
+<p>上面就是通过信息熵来判断是否加密，binwalk使用相关算法来整理信息熵</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140534018.png" srcset="/img/loading.gif" lazyload alt="image-20220402140534018"></p>
+<h1 id="关于web服务"><a href="#关于web服务" class="headerlink" title="关于web服务"></a>关于web服务</h1><p>嵌入式的web服务通常是cgi+http 或 lua+http</p>
+<p>cgi是叫公共网关接口，是Web 服务器运行时外部程序的规范，按<em>CGI</em> 编写的程序可以扩展服务器功能</p>
+<p><em>Lua</em> 是一种轻量小巧的脚本语言,用标准C语言编写并以源代码形式开放, 其设计目的是为了嵌入应用程序中,从而为应用程序提供灵活的扩展和定制功能。</p>
+<p>常见的嵌入式设备使用的web服务多为以下几款</p>
+<h2 id="boa"><a href="#boa" class="headerlink" title="boa"></a>boa</h2><p>单一任务型的http服务器，只会对CGI请求进行<code>fork</code>进程，没有访问控制功能，身份认证都是厂商后边开发的。</p>
+<p>通过<code>translate_uri</code>函数解析请求路径I判断是否为CGI请求，调用<code>init_cgi</code>来<code>execve</code>执行相关CGI程序</p>
+<p><code>translate_uri</code>函数中的<code>init_script_alias</code>函数，负责解析<code>ScriptAlias</code>请求，设置请求cgi类型，查看文件是否存在以及具有相关权限</p>
+<p>通过<code>ScriptAlias</code>在<code>boa.conf</code>配置文件中，该指令设置CGI执行的真实目录</p>
+<blockquote>
+<p>不止是boa，nginx的设置中也存在alias，小米路由器就曾因为这个设置导致路径穿越</p>
+</blockquote>
+<h2 id="uhttpd"><a href="#uhttpd" class="headerlink" title="uhttpd"></a>uhttpd</h2><p>openwrt的默认http服务器，主要是为了和LucI Web接口方便OpenWrt设备管理。</p>
+<p>支持与cgi，lua，UBUS来完成请求。</p>
+<p>uhttpd使用LuCI框架编写lua处理脚本，安全审计偏向于Web安全中的代码审计。</p>
+<p>但也有一些存放的lua脚本是编译过的，需要逆向。</p>
+<p>uhttp下<code>dispatch_find</code>函数根据请求的url找到合适的<code>dispatch_handler</code>。</p>
+<p>请求的url通过<code>check_cgi_path</code>函数校验，则会调用<code>cgi_handle_request</code>函数回调<code>cgi_main</code>函数<code>execl</code>执行对应的CGI程序</p>
+<p>最终调用的<code>/www/cgi-bin/luci</code>即Luci，luci是MVC设计思想的web后端框架。</p>
+<p>简单了解下，后面一款小米路由器分析思路会详细介绍</p>
+<h2 id="Goahead"><a href="#Goahead" class="headerlink" title="Goahead"></a>Goahead</h2><p>在<code>route.txt</code>定义的路由规则，根据匹配的URI来执行不同的handler：有action handler直接在GoAhead进程中执行C函数，CGI handler执行新的CGI程序，也有默认的file handler处理文件请求，还可以自定义新的handler</p>
+<p>详细请看官方文档：<a target="_blank" rel="noopener" href="https://www.embedthis.com/goahead/doc/">https://www.embedthis.com/goahead/doc/</a></p>
+<p>调用<code>websUrlHandlerRequest</code>函数找到匹配URL前缀的处理函数，可以借助<code>websFormDefine</code>函数定义与<code>formName</code>相关联的C处理函数</p>
+<p>由上面几个可以看出来，都是通过URL来选择执行CGI&#x2F;lua或是内部程序</p>
+<p>并且根据<code>PATH_INFO</code>选择执行程序内最终的handler函数。</p>
+<p>这里属于个人复述，这个文章比较详细：<a target="_blank" rel="noopener" href="https://github.com/Larryxi/Larryxi.github.io/blob/master/_posts/2020-02-03-iot-web-server-cgi-handler-analysis.md">https://github.com/Larryxi/Larryxi.github.io/blob/master/_posts/2020-02-03-iot-web-server-cgi-handler-analysis.md</a></p>
+<h1 id="分析的一些思路"><a href="#分析的一些思路" class="headerlink" title="分析的一些思路"></a>分析的一些思路</h1><p>分析的话根据上面的东西来看</p>
+<p>一定要有个设备，或者去模拟这些设备。</p>
+<p>保证正常的web访问，方便查看功能调用的url&#x2F;接口。</p>
+<blockquote>
+<p>一定不要去公网站直接用人家的设备，要做个守法的好孩子！！！</p>
+</blockquote>
+<p>根据上面的知识来获取相关功能的具体实现位置。</p>
+<p>然后分析危险函数，以及是否可控。</p>
+<p>或者</p>
+<p>从危险函数向外分析功能点。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/iot/" class="category-chain-item">iot</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>iot学习感悟</div>
+      <div>http://example.com/article/41f88cb3.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>p1yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 20, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/article/b3e9da69.html" title="totolink后台登录绕过">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">totolink后台登录绕过</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/article/876237c8.html" title="路由器固件解密思路">
+                        <span class="hidden-mobile">路由器固件解密思路</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://p1yang.github.io" target="_blank" rel="nofollow noopener"><span>p1yang</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

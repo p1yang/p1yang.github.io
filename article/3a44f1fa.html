@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="p1yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="固件和exp都已经放在这个地方了：https:&#x2F;&#x2F;gitee.com&#x2F;p1piyang&#x2F;backward-analysis&#x2F;tree&#x2F;master&#x2F; 建议先通一遍文章再动手复现，复现之前一定要保存虚拟机快照，防止出现各种奇奇怪怪的问题 首先要解决环境问题，这里只做配置说明，iot分析环境专门有一篇，请去看IOT固件分析环境搭建 的binwalk，qemu 解压固件直接使用binwalk -Me H">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CVE-2017-17215(华为HG532远程命令执行漏洞)">
+<meta property="og:url" content="http://example.com/article/3a44f1fa.html">
+<meta property="og:site_name" content="p1yang">
+<meta property="og:description" content="固件和exp都已经放在这个地方了：https:&#x2F;&#x2F;gitee.com&#x2F;p1piyang&#x2F;backward-analysis&#x2F;tree&#x2F;master&#x2F; 建议先通一遍文章再动手复现，复现之前一定要保存虚拟机快照，防止出现各种奇奇怪怪的问题 首先要解决环境问题，这里只做配置说明，iot分析环境专门有一篇，请去看IOT固件分析环境搭建 的binwalk，qemu 解压固件直接使用binwalk -Me H">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140542176.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140548936.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140556661.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140603509.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140611607.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140619011.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140624914.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140630469.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140637098.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140644738.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/GzpgZHDk4ARtbdx.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140700858.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140706608.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140714604.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140722740.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140729357.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140738261.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140745136.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140751334.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140806829.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140813521.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140822142.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140829308.png">
+<meta property="article:published_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:author" content="p1yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140542176.png">
+  
+  
+  
+  <title>CVE-2017-17215(华为HG532远程命令执行漏洞) - p1yang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>p1yang&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CVE-2017-17215(华为HG532远程命令执行漏洞)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-07-20 17:57" pubdate>
+          July 20, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.2k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          27 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CVE-2017-17215(华为HG532远程命令执行漏洞)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>固件和exp都已经放在这个地方了：<a target="_blank" rel="noopener" href="https://gitee.com/p1piyang/backward-analysis/tree/master/">https://gitee.com/p1piyang/backward-analysis/tree/master/</a></p>
+<p>建议先通一遍文章再动手复现，复现之前一定要保存虚拟机快照，防止出现各种奇奇怪怪的问题</p>
+<p>首先要解决环境问题，这里只做配置说明，iot分析环境专门有一篇，请去看<code>IOT固件分析环境搭建</code> 的binwalk，qemu</p>
+<h1 id="解压固件"><a href="#解压固件" class="headerlink" title="解压固件"></a>解压固件</h1><p>直接使用<code>binwalk -Me HG532eV100R001C02B015_upgrade_main.bin</code>命令来直接解压固件文件</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140542176.png" srcset="/img/loading.gif" lazyload alt="image-20220402140542176"></p>
+<p>解压完成后，在固件同文件夹下可以看到解压出来的文件夹</p>
+<p>文件夹中的<code>squashfs-root</code>就是我们需要的文件系统了，如果squashfs-root中没有下图的各种文件系统，就是你的binwalk有不完整，去看<code>iot固件分析环境搭建</code></p>
+<h1 id="配置网络"><a href="#配置网络" class="headerlink" title="配置网络"></a>配置网络</h1><p>我们要让qemu虚拟机和我们的ubuntu互通。</p>
+<p>安装网络配置工具</p>
+<div class="code-wrapper"><pre><code class="hljs sh">apt-get install bridge-utils uml-utilities</code></pre></div>
+
+<h5 id="修改ubuntu网络配置文件-etc-network-interfaces"><a href="#修改ubuntu网络配置文件-etc-network-interfaces" class="headerlink" title="修改ubuntu网络配置文件 /etc/network/interfaces/"></a>修改ubuntu网络配置文件 <code>/etc/network/interfaces/</code></h5><p>sudo vim 你一定会把！</p>
+<p>内容改成如下，图下提供了复制粘贴的代码（贴心人）</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140548936.png" srcset="/img/loading.gif" lazyload alt="image-20220402140548936"></p>
+<div class="code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># interfaces(5) file used by ifup(8) and ifdown(8)</span>
+auto lo
+iface lo inet loopback
+
+auto ens33
+iface ens33 inet manual
+up ifconfig ens33 0.0.0.0 up
+
+auto br0
+iface br0 inet dhcp
+
+bridge_ports ens33
+bridge_maxwait 0</code></pre></div>
+
+<h5 id="创建或修改qemu的网络接口启动文件脚本-etc-qemu-ifup"><a href="#创建或修改qemu的网络接口启动文件脚本-etc-qemu-ifup" class="headerlink" title="创建或修改qemu的网络接口启动文件脚本/etc/qemu-ifup"></a>创建或修改qemu的网络接口启动文件脚本<code>/etc/qemu-ifup</code></h5><p>如果没有这个文件直接创建就可以了，如果有的话将里边内容清空，然后写入下面脚本</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140556661.png" srcset="/img/loading.gif" lazyload alt="image-20220402140556661"></p>
+<div class="code-wrapper"><pre><code class="hljs sh"><span class="hljs-meta">#!/bin/sh</span>
+<span class="hljs-comment"># Script to bring a network (tap) device for qemu up.</span>
+<span class="hljs-comment"># The idea is to add the tap device to the same bridge</span>
+<span class="hljs-comment"># as we have default routing to.</span>
+
+<span class="hljs-comment"># in order to be able to find brctl</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Executing /etc/qemu-ifup&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Bringing <span class="hljs-variable">$1</span> for bridge mode...&quot;</span>
+sudo /sbin/ifconfig <span class="hljs-variable">$1</span> 0.0.0.0 promisc up
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Adding <span class="hljs-variable">$1</span> to br0...&quot;</span>
+sudo /sbin/brctl addif br0 <span class="hljs-variable">$1</span>
+<span class="hljs-built_in">sleep</span> 3</code></pre></div>
+
+<p>然后依次执行如下操作</p>
+<div class="code-wrapper"><pre><code class="hljs awk"><span class="hljs-comment">#启动桥接网络赋予可执行权限</span>
+sudo chmod a+x <span class="hljs-regexp">/etc/</span>qemu-ifup
+<span class="hljs-comment">#重启网络服务，使配置生效（注意这个地方配置正常之后，如果你是mac，可能会让你输入mac密码，windows我不知道😬）</span>
+sudo <span class="hljs-regexp">/etc/i</span>nit.d/networking restart
+<span class="hljs-comment">#关闭ens33，启动桥接网络br0（这里如果显示eth0不存在没关系，直接启动br0）</span>
+sudo ifdown eth0
+sudo ifup br0</code></pre></div>
+
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140603509.png" srcset="/img/loading.gif" lazyload alt="image-20220402140603509"></p>
+<p>如图所示，当前网卡为br0</p>
+<p>配置完之后，如果下面qemu虚拟机配置之后，仍然无法获取ip，重启ubuntu</p>
+<h1 id="配置qemu虚拟机"><a href="#配置qemu虚拟机" class="headerlink" title="配置qemu虚拟机"></a>配置qemu虚拟机</h1><p>先去下载debian-mips-qemu镜像文件，每次固件分析要注意对应大小端序的镜像文件（还是有设备的好😭）</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://people.debian.org/~aurel32/qemu/mips/">https://people.debian.org/~aurel32/qemu/mips/</a></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140611607.png" srcset="/img/loading.gif" lazyload alt="image-20220402140611607"></p>
+<p>我们需要红框里的两个文件，然后在文件所在地方启动qemu</p>
+<blockquote>
+<p>这里特别说明，最后一个参数<code>-nographic</code>带上是在终端中直接运行，不会弹出窗口运行，建议一定不要开，我这里开了之后这个窗口的返回快捷键和vmware的一模一样，就导致我只能在mac和qemu中间用，我回不去我的ubuntu了。</p>
+</blockquote>
+<div class="code-wrapper"><pre><code class="hljs sh">sudo qemu-system-mips -M malta -kernel vmlinux-2.6.32-5-4kc-malta -hda debian_squeeze_mips_standard.qcow2 -append <span class="hljs-string">&quot;root=/dev/sda1 console=tty0&quot;</span> -net nic,macaddr=00:16:3e:00:00:01 -net tap -nographic</code></pre></div>
+
+<blockquote>
+<p> 如果你的多次运行qemu，可能会出现如下错误</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140619011.png" srcset="/img/loading.gif" lazyload alt="image-20220402140619011"></p>
+<p>这是服务没有退出导致的</p>
+<p>ps查出当前qemu进程号，kill掉就好了</p>
+<p>ps -e | grep ‘qemu’ </p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140624914.png" srcset="/img/loading.gif" lazyload alt="image-20220402140624914"></p>
+<p>sudo kill 3307</p>
+<p>即可</p>
+</blockquote>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140630469.png" srcset="/img/loading.gif" lazyload alt="image-20220402140630469"></p>
+<p>启动如上图，账号密码都是root</p>
+<p>启动后尝试，ping baidu.com 和 ubuntu</p>
+<p>如果不通</p>
+<div class="code-wrapper"><pre><code class="hljs sh">ifconfig -a</code></pre></div>
+
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140637098.png" srcset="/img/loading.gif" lazyload alt="image-20220402140637098"></p>
+<p>查看网卡第一个是什么，一般都会是<code>eth1</code></p>
+<p>然后修改<code>/etc/network/interfaces</code>，注意这里是在qemu虚拟机中修改</p>
+<div class="code-wrapper"><pre><code class="hljs awk">nano <span class="hljs-regexp">/etc/</span>network/interfaces</code></pre></div>
+
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140644738.png" srcset="/img/loading.gif" lazyload alt="image-20220402140644738"></p>
+<p>第一次配置红框中一般是eth0，将红框中的内容修改为你的网卡名字</p>
+<p>保存后使用下面指令重启eth1</p>
+<div class="code-wrapper"><pre><code class="hljs sh">ifup eth1</code></pre></div>
+
+<p>再次尝试，如果还不行或者ifconfig发现eth1没有分配地址，重启ubuntu或者找原因🤔，不行就恢复快照</p>
+<p>如果成了的话是可以用ssh远程连接qemu虚拟机的</p>
+<div class="code-wrapper"><pre><code class="hljs sh">ssh root@虚拟机ip</code></pre></div>
+
+<p>建议在ubuntu中使用ssh连接，比较方便</p>
+<p>接下来将我们解压出来的文件系统拷贝到qemu</p>
+<div class="code-wrapper"><pre><code class="hljs sh">scp -r ./squashfs-root  root@虚拟机ip:/root/</code></pre></div>
+
+
+
+<h1 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h1><p>通过checkpoint报告中能看到关键字为<code>ctrl</code>和<code>Deviceupgrade</code>，端口号为<code>37215</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/GzpgZHDk4ARtbdx.png" srcset="/img/loading.gif" lazyload alt="image-20210902150556461"></p>
+<p>使用grep来查找</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140700858.png" srcset="/img/loading.gif" lazyload alt="image-20220402140700858"></p>
+<p>两个都指向upnp这个文件，端口号指向mic这个文件</p>
+<p>直接运行会出问题，我们切换根目录到拷贝进来的系统文件中</p>
+<div class="code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">chroot</span> /root/squashfs-root /bin/sh</code></pre></div>
+
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140706608.png" srcset="/img/loading.gif" lazyload alt="image-20220402140706608"></p>
+<p>然后先后运行upnp和mic</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140714604.png" srcset="/img/loading.gif" lazyload alt="image-20220402140714604"></p>
+<p>到这个地方mic已经运行成功了，放着不用管他了</p>
+<p>使用lsof -i:37215可以查看端口是否运行</p>
+<p>用下面命令来查看是否启动成功</p>
+<div class="code-wrapper"><pre><code class="hljs sh">nc -vv 192.168.150.9 37215</code></pre></div>
+
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140722740.png" srcset="/img/loading.gif" lazyload alt="image-20220402140722740"></p>
+<p>成功了就可以跑exp了</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140729357.png" srcset="/img/loading.gif" lazyload alt="image-20220402140729357"></p>
+<p>与checkpoint不同的是，我把溢出的命令修改了（红框处，这里就是灵活使用了），蓝框处修改为qemu的ip</p>
+<p>执行exp后 在mic界面可以看到</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140738261.png" srcset="/img/loading.gif" lazyload alt="image-20220402140738261"></p>
+<p>ls被成功执行了。</p>
+<h1 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h1><p>Ida7.5可以反编译qemu🥳</p>
+<p>通过exp能发现，命令行放在了NewStatusURL标签下，在ida中通过字符串查找</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140745136.png" srcset="/img/loading.gif" lazyload alt="image-20220402140745136"></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140751334.png" srcset="/img/loading.gif" lazyload alt="image-20220402140751334"></p>
+<p>49c的位置使用快捷间p可以创建函数，来反编译</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140806829.png" srcset="/img/loading.gif" lazyload alt="image-20220402140806829"></p>
+<p>snprintf函数将可变个参数按照format格式化成字符串，然后将其复制到str中，即把v5与前面字符串拼接放到v6中，并且system执行了v6</p>
+<p>根据exp的执行效果来推测，ATP_XML_GetChildNodeByName这个函数读取NewStatusURL标签的内容放到了v5。</p>
+<p>伪代码不可信，尽量还是通过汇编代码分析</p>
+<p>倒推能发现，system的参数为<code>0x42C+var_414($sp)</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140813521.png" srcset="/img/loading.gif" lazyload alt="image-20220402140813521"></p>
+<p><code>0x42C+var_414($sp)</code>为snprintf 的第一个参数，<code>0x42C+var_40C($sp)</code>为snprintf的第四个参数</p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140822142.png" srcset="/img/loading.gif" lazyload alt="image-20220402140822142"></p>
+<p>即 <code>0x42C+var_40C($sp)</code>的内容通过函数放到了<code>0x42C+var_414($sp)</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402140829308.png" srcset="/img/loading.gif" lazyload alt="image-20220402140829308"></p>
+<p>而<code>0x42C+var_40C($sp)</code>为ATP_XML_GetChildNodeByName的一个参数，这里应该是读取后放到了<code>0x42C+var_40C($sp)</code></p>
+<blockquote>
+<p>ida的锅🙃，没有办法ATP_XML_GetChildNodeByName做具体分析，但通过网上一些师傅的文章，应该大差不差了</p>
+</blockquote>
+<p>然后了解原理我们就可以通过闭合来实现命令运行了。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/iot/" class="category-chain-item">iot</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CVE-2017-17215(华为HG532远程命令执行漏洞)</div>
+      <div>http://example.com/article/3a44f1fa.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>p1yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 20, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/article/9ff79b23.html" title="关于我">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">关于我</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/article/b3e9da69.html" title="totolink后台登录绕过">
+                        <span class="hidden-mobile">totolink后台登录绕过</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://p1yang.github.io" target="_blank" rel="nofollow noopener"><span>p1yang</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
