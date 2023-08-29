@@ -1,10 +1,10 @@
 http://example.com/article/0.html
-http://example.com/article/0.html
+http://example.com/article/a091bca6.html
+http://example.com/article/3ffd580a.html
+http://example.com/article/16fe91ce.html
 http://example.com/article/49750c0a.html
 http://example.com/article/9d94ce31.html
-http://example.com/article/3ffd580a.html
-http://example.com/article/a091bca6.html
-http://example.com/article/16fe91ce.html
+http://example.com/article/0.html
 http://example.com/article/335bf9d2.html
 http://example.com/article/e55c327a.html
 http://example.com/article/e3065a82.html
