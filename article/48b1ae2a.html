@@ -16,21 +16,21 @@
   <meta name="author" content="p1yang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="一般处理器执行代码程序为，读一条，执行一条 而流水线则使用三个阶段处理： 取指，从储存器中取出指令 译码，识别指令 执行，处理指令，并将结果放回寄存器 arm可以在执行第一条指令的时候，对第二条指令进行译码，并且取出第三条指令 但是！ 无论处理器处于何种状态，程序计数器R15(PC)总是指向“正在取指”的指令，而不是指向“正在执行”的指令或者正在“译码”的指令 人们常以正在执行的指令做第一条参考，">
+    <meta name="description" content="通过两年对iot设备的漏洞挖掘相关工作，我大概将iot的攻击面分成几点，web（即http协议），socker（自有协议），开源软件（三方协议），二进制软件。 web几乎能接触到的所有路由器设备，都会有一个web来管理路由器。这种通过嵌入式http服务来实现前后端与设备的交互，也是多数的iot被黑掉的第一入口。 自有协议在研究摄像头时，其通过一个服务，监听了8822端口，通过udp协议连接之后，需">
 <meta property="og:type" content="article">
-<meta property="og:title" content="三级流水线">
-<meta property="og:url" content="http://example.com/article/f5705223.html">
+<meta property="og:title" content="iotfuzz的思考">
+<meta property="og:url" content="http://example.com/article/48b1ae2a.html">
 <meta property="og:site_name" content="p1yang">
-<meta property="og:description" content="一般处理器执行代码程序为，读一条，执行一条 而流水线则使用三个阶段处理： 取指，从储存器中取出指令 译码，识别指令 执行，处理指令，并将结果放回寄存器 arm可以在执行第一条指令的时候，对第二条指令进行译码，并且取出第三条指令 但是！ 无论处理器处于何种状态，程序计数器R15(PC)总是指向“正在取指”的指令，而不是指向“正在执行”的指令或者正在“译码”的指令 人们常以正在执行的指令做第一条参考，">
+<meta property="og:description" content="通过两年对iot设备的漏洞挖掘相关工作，我大概将iot的攻击面分成几点，web（即http协议），socker（自有协议），开源软件（三方协议），二进制软件。 web几乎能接触到的所有路由器设备，都会有一个web来管理路由器。这种通过嵌入式http服务来实现前后端与设备的交互，也是多数的iot被黑掉的第一入口。 自有协议在研究摄像头时，其通过一个服务，监听了8822端口，通过udp协议连接之后，需">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-08-22T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:published_time" content="2024-02-18T06:10:25.982Z">
+<meta property="article:modified_time" content="2024-02-18T06:30:46.364Z">
 <meta property="article:author" content="p1yang">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>三级流水线 - p1yang</title>
+  <title>iotfuzz的思考 - p1yang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -195,7 +195,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="三级流水线"></span>
+            <span id="subtitle" data-typed-text="iotfuzz的思考"></span>
           
         </div>
 
@@ -206,8 +206,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2021-08-23 00:00" pubdate>
-          August 23, 2021 am
+        <time datetime="2024-02-18 14:10" pubdate>
+          February 18, 2024 pm
         </time>
       </span>
     
@@ -218,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          362 words
+          590 words
         
       </span>
     
@@ -229,7 +229,7 @@
         
         
         
-          4 mins
+          5 mins
         
       </span>
     
@@ -267,24 +267,23 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">三级流水线</h1>
+            <h1 style="display: none">iotfuzz的思考</h1>
             
             
               <div class="markdown-body">
                 
-                <p>一般处理器执行代码程序为，读一条，执行一条</p>
-<p>而流水线则使用三个阶段处理：</p>
-<p>取指，从储存器中取出指令</p>
-<p>译码，识别指令</p>
-<p>执行，处理指令，并将结果放回寄存器</p>
-<p>arm可以在执行第一条指令的时候，对第二条指令进行译码，并且取出第三条指令</p>
-<p>但是！</p>
-<p>无论处理器处于何种状态，程序计数器R15(PC)总是指向“正在取指”的指令，而不是指向“正在执行”的指令或者正在“译码”的指令</p>
-<p>人们常以正在执行的指令做第一条参考，所以pc总是指向第三条指令，或者说是指向正在执行的指令地址再加两条指令地址</p>
-<p>处理器处于ARM状态时，每条指令为4个字节，所以PC值为正在执行的指令地址加8字节，即是：</p>
-<p>PC值 &#x3D; 当前程序执行位置 + 8字节</p>
-<p>处理器处于Thumb状态时，每条指令为2字节，所以PC值为正在执行的指令地址加4字节，即是：</p>
-<p>PC值 &#x3D; 当前程序执行位置 + 4字节</p>
+                <p>通过两年对iot设备的漏洞挖掘相关工作，我大概将iot的攻击面分成几点，web（即http协议），socker（自有协议），开源软件（三方协议），二进制软件。</p>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><p>几乎能接触到的所有路由器设备，都会有一个web来管理路由器。这种通过嵌入式http服务来实现前后端与设备的交互，也是多数的iot被黑掉的第一入口。</p>
+<h2 id="自有协议"><a href="#自有协议" class="headerlink" title="自有协议"></a>自有协议</h2><p>在研究摄像头时，其通过一个服务，监听了8822端口，通过udp协议连接之后，需要对其发送特定的命令来操作。</p>
+<h2 id="开源软件"><a href="#开源软件" class="headerlink" title="开源软件"></a>开源软件</h2><p>像是ssh telnet dropbear，upnp等三方的软件或者提供三方协，mesh组网也一个可以研究的点。</p>
+<h2 id="二进制软件"><a href="#二进制软件" class="headerlink" title="二进制软件"></a>二进制软件</h2><p>虽说上面三种都是由二进制编写而来，但像web可能会通过其他二进制文件来处理内容。</p>
+<p>某个路由器的恢复配置功能会将配置文件上传到路由器，然后通过调用一个二进制程序来处理这个配置文件。</p>
+<p>如果我们发现这个二进制程序的一个问题，然后通过构造配置文件，来绕过web端。</p>
+<p>目前可远程攻击到的设备，基本攻击面就这几种。</p>
+<p>除此之外就是usb等物理插口，侧信道攻击等，目前不在讨论范围。</p>
+<p>二进制软件的fuzz还是以aflfuzz为主，协议fuzz的话，目前了解到比较多的还是boofuzz 支持多协议。</p>
+<p>但boofuzz的库比较老，不知道还有没有替代品，又或者自研。</p>
+<p>目前手上几款路由器，将对其在不同的fuzz情况下进行挖掘。在搜索对iotfuzz的可行性与性价比。</p>
 
                 
               </div>
@@ -303,7 +302,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E4%B8%80%E4%BA%9B%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB%E7%9A%84%E6%8A%80%E6%9C%AF/" class="category-chain-item">一些杂七杂八的技术</a>
+  <a href="/categories/iot/" class="category-chain-item">iot</a>
   
   
 
@@ -323,8 +322,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>三级流水线</div>
-      <div>http://example.com/article/f5705223.html</div>
+      <div>iotfuzz的思考</div>
+      <div>http://example.com/article/48b1ae2a.html</div>
     </div>
     <div class="license-meta">
       
@@ -336,7 +335,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>August 23, 2021</div>
+          <div>February 18, 2024</div>
         </div>
       
       
@@ -366,18 +365,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/article/ec08c5f4.html" title="intel x86寄存器及其汇编指令">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">intel x86寄存器及其汇编指令</span>
-                        <span class="visible-mobile">Previous</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/article/c21195a7.html" title="ARM寄存器及其汇编指令">
-                        <span class="hidden-mobile">ARM寄存器及其汇编指令</span>
+                      <a href="/article/1480780c.html" title="tplink路由器http交互逻辑">
+                        <span class="hidden-mobile">tplink路由器http交互逻辑</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

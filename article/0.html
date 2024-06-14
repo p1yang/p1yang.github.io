@@ -16,29 +16,19 @@
   <meta name="author" content="p1yang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="抓包原理当网卡接收到一个网络报文后，会去遍历系统中所有已经注册了的网络协议，来尝试报文处理。 抓包模块会将自己伪装成一个网络协议，系统在遍历的时候就会发给抓包模块一份，抓包趁机将报文复制一份 tcpdump用法注意，需要root权限 使用 -w  a .pcap 保存到数据包  tcpdump   抓取所有经过第一网络接口的数据包    tcpdump -i lo0   抓取某个网卡的数据 lo0">
-<meta property="og:type" content="article">
-<meta property="og:title" content="tcpdump抓包">
-<meta property="og:url" content="http://example.com/article/201a570f.html">
+    <meta property="og:type" content="article">
+<meta property="og:title" content="p1yang">
+<meta property="og:url" content="http://example.com/article/0.html">
 <meta property="og:site_name" content="p1yang">
-<meta property="og:description" content="抓包原理当网卡接收到一个网络报文后，会去遍历系统中所有已经注册了的网络协议，来尝试报文处理。 抓包模块会将自己伪装成一个网络协议，系统在遍历的时候就会发给抓包模块一份，抓包趁机将报文复制一份 tcpdump用法注意，需要root权限 使用 -w  a .pcap 保存到数据包  tcpdump   抓取所有经过第一网络接口的数据包    tcpdump -i lo0   抓取某个网卡的数据 lo0">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142257905.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142304854.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142319281.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142326636.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142332919.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142338294.png">
-<meta property="og:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142345128.png">
-<meta property="article:published_time" content="2021-10-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-20T09:57:32.000Z">
+<meta property="article:published_time" content="2024-01-04T01:37:29.961Z">
+<meta property="article:modified_time" content="2024-01-04T01:37:33.891Z">
 <meta property="article:author" content="p1yang">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142257905.png">
   
   
   
-  <title>tcpdump抓包 - p1yang</title>
+  <title>p1yang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +193,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="tcpdump抓包"></span>
+            <span id="subtitle" data-typed-text=""></span>
           
         </div>
 
@@ -214,8 +204,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2021-10-09 00:00" pubdate>
-          October 9, 2021 am
+        <time datetime="2024-01-04 09:37" pubdate>
+          January 4, 2024 am
         </time>
       </span>
     
@@ -226,7 +216,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k words
+          0 words
         
       </span>
     
@@ -237,7 +227,7 @@
         
         
         
-          10 mins
+          1 mins
         
       </span>
     
@@ -275,146 +265,18 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">tcpdump抓包</h1>
+            <h1 style="display: none"></h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="抓包原理"><a href="#抓包原理" class="headerlink" title="抓包原理"></a>抓包原理</h1><p>当网卡接收到一个网络报文后，会去遍历系统中所有已经注册了的网络协议，来尝试报文处理。</p>
-<p>抓包模块会将自己伪装成一个网络协议，系统在遍历的时候就会发给抓包模块一份，抓包趁机将报文复制一份</p>
-<h2 id="tcpdump用法"><a href="#tcpdump用法" class="headerlink" title="tcpdump用法"></a>tcpdump用法</h2><p>注意，需要root权限</p>
-<p>使用<code> -w  a .pcap</code> 保存到数据包</p>
-<ol>
-<li>tcpdump</li>
-</ol>
-<blockquote>
-<p>抓取所有经过第一网络接口的数据包</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142257905.png" srcset="/img/loading.gif" lazyload alt="image-20220402142257905"></p>
-<ol start="2">
-<li>tcpdump -i lo0</li>
-</ol>
-<blockquote>
-<p>抓取某个网卡的数据 lo0是我本地网卡，用ifconfig可以查看</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142304854.png" srcset="/img/loading.gif" lazyload alt="image-20220402142304854"></p>
-<ol start="3">
-<li>tcpdump -i en0 host 110.242.68.3</li>
-</ol>
-<blockquote>
-<p>抓取经过en0 其目标地址或者源地址是110.242.68.3的数据包</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142319281.png" srcset="/img/loading.gif" lazyload alt="image-20220402142319281"></p>
-<ol start="4">
-<li>tcpdump -i bridge100 host 192.168.150.1 and 192.168.150.14</li>
-</ol>
-<blockquote>
-<p>抓取经过bridge100的主机192.168.150.1 与主机192.168.150.14间的流量包</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142326636.png" srcset="/img/loading.gif" lazyload alt="image-20220402142326636"></p>
-<ol start="5">
-<li>tcpdump -i bridge100 -n  host 192.168.150.1 and ! 192.168.150.14</li>
-</ol>
-<blockquote>
-<p>抓取经过bridge100的主机192.168.150.1 与除了主机192.168.150.14的所有流量包</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142332919.png" srcset="/img/loading.gif" lazyload alt="image-20220402142332919"></p>
-<ol start="6">
-<li>tcpdump src host 192.168.150.14</li>
-</ol>
-<blockquote>
-<p>抓取主机192.168.150.14 发送的所有数据</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142338294.png" srcset="/img/loading.gif" lazyload alt="image-20220402142338294"></p>
-<ol start="7">
-<li>tcpdump dst host 192.168.150.14</li>
-</ol>
-<blockquote>
-<p>抓取所有流向192.168.150.14的数据</p>
-</blockquote>
-<p><img src="https://fastly.jsdelivr.net/gh/p1yang/image@main/image-20220402142345128.png" srcset="/img/loading.gif" lazyload alt="image-20220402142345128"></p>
-<ol start="8">
-<li>tcpdump host 192.168.150.14 and tcp port 80</li>
-</ol>
-<blockquote>
-<p>抓取主机192.168.150.14所有在TCP 80端口的数据包：</p>
-</blockquote>
-<ol start="9">
-<li>tcpdump host 192.168.150.14 and dst port 80</li>
-</ol>
-<blockquote>
-<p>抓取主机192.168.150.14所有在http 80端口的数据包：</p>
-</blockquote>
-<ol start="10">
-<li>tcpdump port 80</li>
-</ol>
-<blockquote>
-<p>抓取80端口获取或者发送的数据，可以用dst和src来来区分</p>
-</blockquote>
-<ol start="11">
-<li>tcpdump net 192.168</li>
-</ol>
-<blockquote>
-<p>抓取网络192.168的数据，可以用dst和src来来区分</p>
-</blockquote>
-<ol start="12">
-<li>tcpdump 协议名</li>
-</ol>
-<blockquote>
-<p>过滤协议</p>
-</blockquote>
-<ol start="13">
-<li>tcpdump ‘((tcp) and (port 80) and ((dst host 192.168.150.1) or (dst host 192.168.150.14)))’</li>
-</ol>
-<blockquote>
-<p>目标是主机（192.168.150.1 或者192.168.150.14） 的 80端口的tcp的数据，注意理解其用法</p>
-</blockquote>
-<ol start="14">
-<li>tcpdump ‘tcp[tcpflags] &#x3D; tcp-syn’</li>
-</ol>
-<blockquote>
-<p>只抓syn包，如果要抓syn和ACK包 去掉等号及其后面</p>
-</blockquote>
-<ol start="15">
-<li>tcpdump ‘((port 25) and (tap[(tcp[12]&gt;&gt;2):4] &#x3D; 0x4d41494c))’</li>
-</ol>
-<blockquote>
-<p>抓取数据区开头为MAIL的包，MAIL的十六进制为 0x4d41494c</p>
-</blockquote>
-<ol start="16">
-<li>tcpdump ‘tcp[(tcp[12] &gt;&gt; 2):4 &#x3D; 0x47455420]’</li>
-</ol>
-<blockquote>
-<p>抓取get包，get的十六进制0x47455420，post同理</p>
-</blockquote>
-
+                
                 
               </div>
             
             <hr/>
             <div>
               <div class="post-metas my-3">
-  
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
-      
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E4%B8%80%E4%BA%9B%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB%E7%9A%84%E6%8A%80%E6%9C%AF/" class="category-chain-item">一些杂七杂八的技术</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-    </div>
   
   
 </div>
@@ -425,8 +287,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>tcpdump抓包</div>
-      <div>http://example.com/article/201a570f.html</div>
+      <div></div>
+      <div>http://example.com/article/0.html</div>
     </div>
     <div class="license-meta">
       
@@ -438,7 +300,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>October 9, 2021</div>
+          <div>January 4, 2024</div>
         </div>
       
       
@@ -468,9 +330,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/article/335a6663.html" title="java序列化与反序列化">
+                      <a href="/article/1480780c.html" title="tplink路由器http交互逻辑">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">java序列化与反序列化</span>
+                        <span class="hidden-mobile">tplink路由器http交互逻辑</span>
                         <span class="visible-mobile">Previous</span>
                       </a>
                     
@@ -478,8 +340,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/article/570c6a7.html" title="Windows ShellCode提取加载与免杀">
-                        <span class="hidden-mobile">Windows ShellCode提取加载与免杀</span>
+                      <a href="/article/493c4167.html" title="扬州慢·淮左名都">
+                        <span class="hidden-mobile">扬州慢·淮左名都</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
